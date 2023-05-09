@@ -1,13 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import bridge from "@vkontakte/vk-bridge";
-import {
-  AdaptivityProvider,
-  AppRoot,
-  ConfigProvider,
-  Platform,
-} from "@vkontakte/vkui";
-import "dignals-react";
+import { AdaptivityProvider, AppRoot, ConfigProvider } from "@vkontakte/vkui";
+import "dignals-react/build/jsxPatch";
 
 import App from "./App";
 import BugsnagPluginReact from "@bugsnag/plugin-react";
