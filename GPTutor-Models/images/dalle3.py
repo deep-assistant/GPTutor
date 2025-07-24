@@ -53,7 +53,7 @@ def generate_dalle(prompt: str):
     print(os.environ.get('API_KEYS_120'))
     openai = OpenAI(
         api_key=os.environ.get('API_KEYS_120'),
-        base_url="https://api.deep-foundation.tech/v1/",
+        base_url="https://api.deep.assistant.run.place/v1/",
     )
 
     chat_completion = openai.chat.completions.create(
