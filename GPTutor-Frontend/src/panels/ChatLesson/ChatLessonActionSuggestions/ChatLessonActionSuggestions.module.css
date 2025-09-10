@@ -1,0 +1,10 @@
+.actionSuggestions {
+  display: grid;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+}

@@ -8,6 +8,7 @@ import { lessonsController } from "$/entity/lessons";
 
 import { ChatLessonWriteBarBefore } from "./ChatLessonWriteBarBefore";
 import { ChatLessonAdditionalRequests } from "./ChatLessonAdditionalRequests";
+import { ChatLessonActionSuggestions } from "./ChatLessonActionSuggestions";
 
 interface IProps {
   id: string;
@@ -15,6 +16,7 @@ interface IProps {
 
 function ChatLesson({ id }: IProps) {
   const [isAdditionalOpen, setAdditionsOpen] = useState(true);
+  const [isActionSuggestionsOpen, setActionSuggestionsOpen] = useState(true);
 
   const onClickAdditional = useCallback(
     () => setAdditionsOpen((prev) => !prev),
@@ -33,6 +35,7 @@ function ChatLesson({ id }: IProps) {
   };
 
   const additionalRequests = currentLesson?.additionalRequests || [];
+  const actionSuggestions = currentLesson?.actionSuggestions || [];
   const isStopped = chatGpt.chatGptLesson.timer.isStopped$.get();
   const isTyping = chatGpt.chatGptLesson.sendCompletions$.loading.get();
   const isBlockActions = chatGpt.chatGptLesson.isBlockActions$.get();
@@ -51,13 +54,22 @@ function ChatLesson({ id }: IProps) {
           />
         }
         additionalRequest={(handleSend) => (
-          <ChatLessonAdditionalRequests
-            isStopped={isStopped}
-            additionalRequests={additionalRequests}
-            isAdditionalOpen={isAdditionalOpen}
-            handleSend={handleSend}
-            isTyping={isTyping || isBlockActions}
-          />
+          <>
+            <ChatLessonAdditionalRequests
+              isStopped={isStopped}
+              additionalRequests={additionalRequests}
+              isAdditionalOpen={isAdditionalOpen}
+              handleSend={handleSend}
+              isTyping={isTyping || isBlockActions}
+            />
+            <ChatLessonActionSuggestions
+              actionSuggestions={actionSuggestions}
+              isActionSuggestionsOpen={isActionSuggestionsOpen}
+              handleSend={handleSend}
+              isTyping={isTyping || isBlockActions}
+              isStopped={isStopped}
+            />
+          </>
         )}
         onStartChat={onStartChat}
         chatGpt={chatGpt.chatGptLesson}

@@ -1,5 +1,6 @@
 import { LessonItem } from "../LessonItem";
 import { LessonRequest } from "../LessonRequest";
+import { ActionSuggestion } from "../ActionSuggestion";
 
 const BasedJS = "Основы JavaScript";
 const AdvancedJS = "Продвинутый JavaScript";
@@ -20,6 +21,11 @@ const lessonJS1 = new LessonItem(
     new LessonRequest("Объясни подробнее var, укажи примеры", "Переменные var"),
     new LessonRequest("В чем отличия let от var?"),
     new LessonRequest("Когда лучше использовать let, const, var?"),
+  ],
+  [
+    new ActionSuggestion("Дай мне задание на переменные для практики", "Практическое задание"),
+    new ActionSuggestion("Покажи пример реального использования переменных", "Реальный пример"),
+    new ActionSuggestion("Объясни частые ошибки при работе с переменными", "Частые ошибки"),
   ]
 );
 
@@ -37,6 +43,10 @@ const lessonJS2 = new LessonItem(
     new LessonRequest("Объясни null в js", "null"),
     new LessonRequest("Объясни undefined в js", "undefined"),
     new LessonRequest("Объясни оператор typeof", "Оператор typeof"),
+  ],
+  [
+    new ActionSuggestion("Покажи как проверить тип переменной в разных случаях", "Проверка типов"),
+    new ActionSuggestion("Дай упражнения на приведение типов", "Упражнения на типы"),
   ]
 );
 
@@ -152,6 +162,11 @@ const lessonJS9 = new LessonItem(
       "Стрелочные функции"
     ),
     new LessonRequest("Объясни контекст функции в js", "Контекст"),
+  ],
+  [
+    new ActionSuggestion("Дай мне задачу написать функцию", "Написать функцию"),
+    new ActionSuggestion("Покажи примеры использования колбэков", "Примеры колбэков"),
+    new ActionSuggestion("Объясни как работает замыкание в функциях", "Замыкания"),
   ]
 );
 
