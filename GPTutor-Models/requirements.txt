@@ -19,3 +19,6 @@ gigachat==0.1.31
 faiss-cpu==1.8.0.post1
 langchainhub==0.1.20
 langgraph==0.1.8
+pytest==7.4.2
+pytest-mock==3.11.1
+pytest-flask==1.2.0

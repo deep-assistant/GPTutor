@@ -7,3 +7,12 @@
 .env-frontend
 .env-frontend-stage
 node_modules
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+dist/
+build/
