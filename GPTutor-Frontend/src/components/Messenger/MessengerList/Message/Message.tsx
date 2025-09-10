@@ -8,7 +8,7 @@ import {
   Text,
   Title,
 } from "@vkontakte/vkui";
-import { Icon24CheckCircleOutline } from "@vkontakte/icons";
+import { Icon24CheckCircleOutline, Icon24Share } from "@vkontakte/icons";
 
 import { GptMessage } from "$/entity/GPT";
 
@@ -23,6 +23,7 @@ import classes from "./Message.module.css";
 import { Copy } from "$/components/Copy";
 import { ChatGptTemplate } from "$/entity/GPT/ChatGptTemplate";
 import { appService } from "$/services/AppService";
+import { shareService } from "$/services/ShareService";
 
 interface IProps {
   chatGpt: ChatGptTemplate;
@@ -43,6 +44,15 @@ function Message({ chatGpt, message }: IProps) {
   const onSelectFirstMessage = (e: any) => {
     e.stopPropagation();
     message.toggleSelected();
+  };
+
+  const onForwardMessage = (e: any) => {
+    e.stopPropagation();
+    const senderName = message.role === "assistant" 
+      ? appService.getGPTName() 
+      : vkUser?.first_name || "Пользователь";
+    
+    shareService.forwardMessage(message.content$.get(), senderName);
   };
 
   return (
@@ -69,6 +79,9 @@ function Message({ chatGpt, message }: IProps) {
                 <WarningTooltip />
               )}
               <Copy textToClickBoard={message.content$.get()} />
+              <IconButton onClick={onForwardMessage}>
+                <Icon24Share />
+              </IconButton>
               <IconButton
                 className={selected ? classes.selectedIcon : ""}
                 onClick={onSelectFirstMessage}

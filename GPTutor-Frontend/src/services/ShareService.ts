@@ -14,6 +14,23 @@ class ShareService {
         console.log(data);
       });
   }
+
+  forwardMessage(messageContent: string, senderName: string) {
+    const forwardText = `Сообщение от ${senderName}:\n\n${messageContent}\n\nПередано через GPTutor: https://vk.com/app51602327`;
+    
+    return bridge
+      .send("VKWebAppShowWallPostBox", {
+        message: forwardText,
+      })
+      .then((data) => {
+        console.log("Message forwarded successfully:", data);
+        return data;
+      })
+      .catch((error) => {
+        console.error("Error forwarding message:", error);
+        throw error;
+      });
+  }
 }
 
 export const shareService = new ShareService();
