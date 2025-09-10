@@ -74,6 +74,8 @@ import ApplicationInfoHumor from "./modals/ApplicationInfoHumor/ApplicationInfoH
 import { BingPanel } from "$/panels/BingPanel";
 import VKDocQuestionPanel from "./panels/VKDocQuestionPanel/VKDocQestionPanel";
 import { VkDocQuestionRequest } from "$/panels/VkDocQuestionRequest";
+import TopicSuggestions from "./panels/TopicSuggestions/TopicSuggestions";
+import TopicSuggestionModal from "./modals/TopicSuggestionModal/TopicSuggestionModal";
 import { retrieveLaunchParams } from "@telegram-apps/sdk";
 
 const App = () => {
@@ -156,6 +158,7 @@ const App = () => {
                 <Agreement id={Modals.agreement} />
                 <DetailImage id={Modals.detailImage} settlingHeight={100} />
                 <WeakRequestModal id={Modals.weakRequest} />
+                <TopicSuggestionModal id={Modals.topicSuggestionModal} />
               </ModalRoot>
             }
           >
@@ -198,6 +201,7 @@ const App = () => {
                 <BingPanel id={Panels.bingPanel} />
                 <VKDocQuestionPanel id={Panels.vkDocQuestionPanel} />
                 <VkDocQuestionRequest id={Panels.vkDocQuestionRequest} />
+                <TopicSuggestions id={Panels.topicSuggestions} />
               </View>
             )}
           </SplitLayout>
