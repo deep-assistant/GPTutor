@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 
-import { Placeholder, Search, SimpleCell } from "@vkontakte/vkui";
-import { Icon20ChevronRight, Icon56GhostOutline } from "@vkontakte/icons";
+import { Placeholder, Search, SimpleCell, Div, Button } from "@vkontakte/vkui";
+import { Icon20ChevronRight, Icon56GhostOutline, Icon24AddOutline } from "@vkontakte/icons";
 
 import { ChapterItem, LessonItem } from "$/entity/lessons";
+import { useNavigationContext } from "$/NavigationContext";
 
 import classes from "./Lessons.module.css";
 import TertiaryTitle from "$/components/TertiaryTitle";
@@ -15,6 +16,7 @@ interface IProps {
 
 function Lessons({ currentChapter, onClickLesson }: IProps) {
   const lessons = currentChapter.lessons.get();
+  const { goToLessonSuggestion } = useNavigationContext();
 
   useEffect(() => {
     currentChapter.searchLessons(currentChapter.searchValue$.get());
@@ -49,6 +51,17 @@ function Lessons({ currentChapter, onClickLesson }: IProps) {
           ))}
         </React.Fragment>
       ))}
+      <Div>
+        <Button
+          size="m"
+          mode="secondary"
+          before={<Icon24AddOutline />}
+          onClick={goToLessonSuggestion}
+          style={{ width: "100%" }}
+        >
+          Предложить урок
+        </Button>
+      </Div>
     </div>
   );
 }
