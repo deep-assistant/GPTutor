@@ -15,6 +15,7 @@
 
 .tabBar {
     background: var(--vkui--color_background_content);
+    z-index: 50;
 }
 
 .tabBar :global(.vkuiTabbar__in) {
