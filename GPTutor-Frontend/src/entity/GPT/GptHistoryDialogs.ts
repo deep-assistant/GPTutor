@@ -24,6 +24,10 @@ export class GptHistoryDialogs {
 
   dialogs = sig<History[]>([]);
   searchValue$ = sig("");
+  typeFilter$ = sig<string | null>(null);
+  lessonNameFilter$ = sig<string | null>(null);
+  dateFromFilter$ = sig<string | null>(null);
+  dateToFilter$ = sig<string | null>(null);
 
   pageNumber = 0;
 
@@ -37,7 +41,11 @@ export class GptHistoryDialogs {
     this.pageNumber = 0;
     const history = await this.getHistory$.run(
       this.pageNumber,
-      this.searchValue$.get().trim()
+      this.searchValue$.get().trim(),
+      this.typeFilter$.get() || undefined,
+      this.lessonNameFilter$.get() || undefined,
+      this.dateFromFilter$.get() || undefined,
+      this.dateToFilter$.get() || undefined
     );
     this.dialogs.set(history.content);
   }
@@ -48,7 +56,11 @@ export class GptHistoryDialogs {
     this.pageNumber++;
     const history = await this.getHistory$.run(
       this.pageNumber,
-      this.searchValue$.get().trim()
+      this.searchValue$.get().trim(),
+      this.typeFilter$.get() || undefined,
+      this.lessonNameFilter$.get() || undefined,
+      this.dateFromFilter$.get() || undefined,
+      this.dateToFilter$.get() || undefined
     );
 
     this.dialogs.set([...this.dialogs.get(), ...history.content]);
@@ -57,6 +69,34 @@ export class GptHistoryDialogs {
   setSearchValue = (value: string) => {
     console.log(value);
     this.searchValue$.set(value);
+  };
+
+  setTypeFilter = (type: string | null) => {
+    this.typeFilter$.set(type);
+  };
+
+  setLessonNameFilter = (lessonName: string | null) => {
+    this.lessonNameFilter$.set(lessonName);
+  };
+
+  setDateFromFilter = (dateFrom: string | null) => {
+    this.dateFromFilter$.set(dateFrom);
+  };
+
+  setDateToFilter = (dateTo: string | null) => {
+    this.dateToFilter$.set(dateTo);
+  };
+
+  clearAllFilters = () => {
+    this.searchValue$.set("");
+    this.typeFilter$.set(null);
+    this.lessonNameFilter$.set(null);
+    this.dateFromFilter$.set(null);
+    this.dateToFilter$.set(null);
+  };
+
+  applyFilters = async () => {
+    await this.loadHistory();
   };
 
   search = async () => {

@@ -38,11 +38,19 @@ public class HistoryController {
             HttpServletRequest request,
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "") String search
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String lessonName,
+            @RequestParam(required = false) String dateFrom,
+            @RequestParam(required = false) String dateTo
     ) {
         return ResponseEntity.ok().body(
                 historyService.getAllHistory((String) request.getAttribute("vkUserId"),
                         search,
+                        type,
+                        lessonName,
+                        dateFrom,
+                        dateTo,
                         pageNumber,
                         pageSize
                 )
