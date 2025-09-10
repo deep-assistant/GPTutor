@@ -19,14 +19,15 @@ import java.util.UUID;
 
 @RestController
 public class ImagesController {
-    @Autowired
-    ImagesService imagesService;
-
-    @Autowired
-    ComplaintsService complaintsService;
-
-    @Autowired
-    ImageLikeService imageLikeService;
+    private final ImagesService imagesService;
+    private final ComplaintsService complaintsService;
+    private final ImageLikeService imageLikeService;
+    
+    public ImagesController(ImagesService imagesService, ComplaintsService complaintsService, ImageLikeService imageLikeService) {
+        this.imagesService = imagesService;
+        this.complaintsService = complaintsService;
+        this.imageLikeService = imageLikeService;
+    }
 
     @PostMapping(path = "/image")
     List<Image> generateImage(@RequestBody GenerateImageRequest prompt, HttpServletRequest request) {

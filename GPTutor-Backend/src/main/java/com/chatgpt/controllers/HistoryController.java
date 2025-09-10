@@ -18,12 +18,13 @@ import java.util.UUID;
 
 @RestController
 public class HistoryController {
+    private final HistoryService historyService;
+    private final MessageRepository messageRepository;
 
-    @Autowired
-    HistoryService historyService;
-
-    @Autowired
-    MessageRepository messageRepository;
+    public HistoryController(HistoryService historyService, MessageRepository messageRepository) {
+        this.historyService = historyService;
+        this.messageRepository = messageRepository;
+    }
 
     @PostMapping(path = "/history")
     @RateLimiter(name = "historyLimit", fallbackMethod = "fallbackMethod")
