@@ -32,6 +32,7 @@ function Modes({ id }: IProps) {
     goToChatInterview,
     goToLeetcodeProblems,
     goToEditor,
+    goToMarkdownReader,
   } = useNavigationContext();
 
   return (
@@ -88,6 +89,14 @@ function Modes({ id }: IProps) {
             trainers.getCurrentTrainer()?.setInitialValue();
             chatGpt.chatGptTrainer.messages$.set([]);
             goToEditor();
+          }}
+        />
+        <Cards
+          isBottom
+          title="Инструменты"
+          chapters={[{ type: "MARKDOWN_READER" as ModeType, header: "Markdown Reader" }]}
+          onClickChapter={() => {
+            goToMarkdownReader();
           }}
         />
       </AppContainer>

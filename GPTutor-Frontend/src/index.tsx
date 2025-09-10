@@ -128,6 +128,10 @@ const routes = {
     Panels.vkDocQuestionRequest,
     Views.viewMain
   ),
+  [RoutingPages.markdownReader]: new Page(
+    Panels.markdownReader,
+    Views.viewMain
+  ),
 };
 
 const router = new Router(routes);

@@ -57,6 +57,7 @@ export type NavigationContextType = {
   goToAnecdoteMain: () => void;
   goToBingPanel: () => void;
   goToVkDocQuestionRequest: () => void;
+  goToMarkdownReader: () => void;
   openAlert: (data: AlertType) => void;
   alert: AlertType;
   isForbidden: boolean;
@@ -223,6 +224,10 @@ export function NavigationContextProvider({
     router.pushPage(RoutingPages.vkDocQuestionRequest);
   };
 
+  const goToMarkdownReader = () => {
+    router.pushPage(RoutingPages.markdownReader);
+  };
+
   return (
     <NavigationContext.Provider
       value={{
@@ -266,6 +271,7 @@ export function NavigationContextProvider({
         goToAnecdoteMain,
         goToVkDocQuestionRequest,
         goToBingPanel,
+        goToMarkdownReader,
         alert,
         isForbidden,
       }}
