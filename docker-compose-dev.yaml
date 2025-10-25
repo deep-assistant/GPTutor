@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # Java Backend (default - comment out to use Bun backend)
   backend-dev:
     env_file:
       - .env-dev
@@ -10,6 +11,17 @@ services:
       - postgresql-dev
     ports:
       - "8080:8080"
+
+  # Bun Backend (alternative - uncomment to use instead of Java backend)
+  # backend-bun-dev:
+  #   env_file:
+  #     - .env-dev
+  #   build: ./GPTutor-Backend-Bun
+  #   container_name: backend-bun-dev
+  #   depends_on:
+  #     - postgresql-dev
+  #   ports:
+  #     - "8080:8080"
 
   models-dev:
     env_file:
