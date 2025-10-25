@@ -52,6 +52,7 @@ export type NavigationContextType = {
   goToMermaidPage: () => void;
   goToAnecdoteGeneration: () => void;
   goToAdditionalRequest: () => void;
+  goToLessonSuggestion: () => void;
   openApplicationInfoHumor: () => void;
   goToAnecdoteNews: () => void;
   goToAnecdoteMain: () => void;
@@ -204,6 +205,10 @@ export function NavigationContextProvider({
     router.pushPage(RoutingPages.additionalRequest);
   };
 
+  const goToLessonSuggestion = () => {
+    router.pushPage(RoutingPages.lessonSuggestion);
+  };
+
   const goToAnecdoteGeneration = () => {
     router.pushPage(RoutingPages.anecdoteGeneration);
   };
@@ -260,6 +265,7 @@ export function NavigationContextProvider({
         goToGPTutorProfile,
         goToMermaidPage,
         goToAdditionalRequest,
+        goToLessonSuggestion,
         goToAnecdoteGeneration,
         openApplicationInfoHumor,
         goToAnecdoteNews,

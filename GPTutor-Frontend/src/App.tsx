@@ -67,6 +67,7 @@ import { GPTutorProfile } from "$/panels/GPTutorProfile";
 import { transformVKBridgeAdaptivity } from "$/utility/strings";
 import { MermaidPage } from "$/panels/MermaidPage";
 import { AdditionalRequests } from "$/panels/AdditionalRequests";
+import { LessonSuggestion } from "$/panels/LessonSuggestion";
 import { AnecdoteMain } from "$/panels/AnecdoteMain";
 import AnecdoteGeneration from "./panels/AnecdoteGeneration/AnecdoteGeneration";
 import { AnecdoteNews } from "$/panels/AnecdoteNews";
@@ -192,6 +193,7 @@ const App = () => {
                 <GPTutorProfile id={Panels.gptutorProfile} />
                 <MermaidPage id={Panels.mermaidPage} />
                 <AdditionalRequests id={Panels.additionalRequest} />
+                <LessonSuggestion id={Panels.lessonSuggestion} />
                 <AnecdoteMain id={Panels.mainAnecdote} />
                 <AnecdoteGeneration id={Panels.anecdoteGeneration} />
                 <AnecdoteNews id={Panels.anecdoteNews} />

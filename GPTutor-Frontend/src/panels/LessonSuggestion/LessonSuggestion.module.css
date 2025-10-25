@@ -1,0 +1,66 @@
+.container {
+  padding: 16px;
+}
+
+.title {
+  color: var(--vkui--color_text_primary);
+  margin-bottom: 16px;
+}
+
+.magicIcon {
+  color: var(--vkui--color_icon_accent);
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestionCard {
+  border: 1px solid var(--vkui--color_separator_alpha);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--vkui--color_background_content);
+}
+
+.suggestionTitle {
+  font-weight: 600;
+  color: var(--vkui--color_text_primary);
+  margin-bottom: 8px;
+}
+
+.suggestionMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--vkui--color_text_secondary);
+}
+
+.statusBadge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.statusPending {
+  background: var(--vkui--color_background_warning);
+  color: var(--vkui--color_text_primary);
+}
+
+.statusApproved {
+  background: var(--vkui--color_background_positive);
+  color: var(--vkui--color_text_contrast);
+}
+
+.statusRejected {
+  background: var(--vkui--color_background_negative);
+  color: var(--vkui--color_text_contrast);
+}
