@@ -81,6 +81,7 @@ services:
     networks:
       - trfk
 
+  # Java Backend (default - comment out to use Bun backend)
   backend-prod:
     env_file:
       - .env
@@ -96,6 +97,23 @@ services:
       - "traefik.http.routers.backend-prod.tls.certresolver=myresolver"
     networks:
       - trfk
+
+  # Bun Backend (alternative - uncomment to use instead of Java backend)
+  # backend-bun-prod:
+  #   env_file:
+  #     - .env
+  #     - .env-prod
+  #   build: ./GPTutor-Backend-Bun
+  #   container_name: backend-bun-prod
+  #   depends_on:
+  #     - postgresql-prod
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.backend-prod.rule=Host(`prod.${HOST}`)"
+  #     - "traefik.http.routers.backend-prod.entrypoints=websecure"
+  #     - "traefik.http.routers.backend-prod.tls.certresolver=myresolver"
+  #   networks:
+  #     - trfk
 
   models-prod:
     env_file:

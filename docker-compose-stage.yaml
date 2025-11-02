@@ -101,6 +101,7 @@ services:
     networks:
       - trfk
 
+  # Java Backend (default - comment out to use Bun backend)
   backend-stage:
     env_file:
       - .env
@@ -116,6 +117,23 @@ services:
       - "traefik.http.routers.backend-stage.tls.certresolver=myresolver"
     networks:
       - trfk
+
+  # Bun Backend (alternative - uncomment to use instead of Java backend)
+  # backend-bun-stage:
+  #   env_file:
+  #     - .env
+  #     - .env-stage
+  #   build: ./GPTutor-Backend-Bun
+  #   container_name: backend-bun-stage
+  #   depends_on:
+  #     - postgresql-stage
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.backend-stage.rule=Host(`stage.${HOST}`)"
+  #     - "traefik.http.routers.backend-stage.entrypoints=websecure"
+  #     - "traefik.http.routers.backend-stage.tls.certresolver=myresolver"
+  #   networks:
+  #     - trfk
 
   rag-stage:
     env_file:
