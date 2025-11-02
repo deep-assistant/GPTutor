@@ -2,9 +2,10 @@
     "name": "chat",
     "version": "0.0.0",
     "scripts": {
-        "start": "cross-env GENERATE_SOURCEMAP=false PORT=10888 HTTPS=true craco start",
-        "build": "cross-env GENERATE_SOURCEMAP=false craco build",
-        "test": "craco test",
+        "start": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "test": "vitest",
         "predeploy": "npm run build",
         "deploy": "vk-miniapps-deploy"
     },
@@ -63,7 +64,7 @@
     },
     "devDependencies": {
         "@babel/runtime": "^7.21.5",
-        "@craco/craco": "^7.1.0",
+        "@vitejs/plugin-react": "^4.0.3",
         "@types/jest": "^29.5.1",
         "@types/katex": "^0.16.7",
         "@types/lodash.debounce": "^4.0.7",
@@ -80,7 +81,8 @@
         "jest": "^27.5.1",
         "prettier": "^2.8.7",
         "react-hot-loader": "^4.13.0",
-        "react-scripts": "^5.0.1",
+        "vite": "^4.4.5",
+        "vitest": "^0.34.1",
         "ts-jest": "^29.1.0",
         "typescript": "^5.0.4"
     },
