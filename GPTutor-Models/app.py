@@ -1,61 +1,87 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
+import logging
+import traceback
 
 from images.dalle3 import generate_dalle
 from images.prodia import txt2img
 from vk_docs.index import create_question_vk_doc
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @app.post('/llm')
 def llm_post():
-    return None
+    return jsonify({"message": "LLM POST endpoint not implemented"}), 501
 
 
 @app.get('/llm')
 def llm_get():
-    return []
+    return jsonify([])
 
 
 @app.post("/image")
 def image():
-    return txt2img(
-        prompt=request.json["prompt"],
-        model=request.json["modelId"],
-        negative_prompt=request.json["negativePrompt"],
-        scheduler=request.json["scheduler"],
-        guidance_scale=request.json["guidanceScale"],
-        seed=request.json["seed"],
-        steps=request.json["numInferenceSteps"],
-    )
+    try:
+        if not request.json:
+            return jsonify({"error": "JSON payload required"}), 400
+        
+        required_fields = ["prompt", "modelId", "negativePrompt", "scheduler", "guidanceScale", "seed", "numInferenceSteps"]
+        for field in required_fields:
+            if field not in request.json:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+        
+        result = txt2img(
+            prompt=request.json["prompt"],
+            model=request.json["modelId"],
+            negative_prompt=request.json["negativePrompt"],
+            scheduler=request.json["scheduler"],
+            guidance_scale=request.json["guidanceScale"],
+            seed=request.json["seed"],
+            steps=request.json["numInferenceSteps"],
+        )
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in image generation: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({"error": "Image generation failed"}), 500
 
 
 @app.post("/vk-doc-question")
 def vk_doc_question():
-    return create_question_vk_doc(
-        question=request.json["question"],
-        source=request.json["source"]
-    )
+    try:
+        if not request.json:
+            return jsonify({"error": "JSON payload required"}), 400
+        
+        if "question" not in request.json or "source" not in request.json:
+            return jsonify({"error": "Missing required fields: question, source"}), 400
+        
+        result = create_question_vk_doc(
+            question=request.json["question"],
+            source=request.json["source"]
+        )
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in VK doc question: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({"error": "VK doc question processing failed"}), 500
 
 
 @app.post("/dalle")
 def dalle():
-    print(request.json)
-
     try:
-        return txt2img(
-            prompt=request.json["prompt"],
-            model=request.json["modelId"],
-            negative_prompt=request.json["negativePrompt"],
-            scheduler=request.json["scheduler"],
-            guidance_scale=request.json["guidanceScale"],
-            seed=request.json["seed"],
-            steps=request.json["numInferenceSteps"],
-        )
+        if not request.json:
+            return jsonify({"error": "JSON payload required"}), 400
+        
+        logger.info(f"DALLE request: {request.json}")
+        
+        required_fields = ["prompt", "modelId", "negativePrompt", "scheduler", "guidanceScale", "seed", "numInferenceSteps"]
+        for field in required_fields:
+            if field not in request.json:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
 
-    except Exception as e:
-        print(e)
-        return txt2img(
+        result = txt2img(
             prompt=request.json["prompt"],
             model=request.json["modelId"],
             negative_prompt=request.json["negativePrompt"],
@@ -64,6 +90,11 @@ def dalle():
             seed=request.json["seed"],
             steps=request.json["numInferenceSteps"],
         )
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in DALLE generation: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({"error": "DALLE generation failed"}), 500
 
 
 def run_flask():

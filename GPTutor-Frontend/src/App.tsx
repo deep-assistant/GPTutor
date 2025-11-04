@@ -1,4 +1,11 @@
 import React, { useEffect } from "react";
+import { retrieveLaunchParams } from "@telegram-apps/sdk";
+import { useLocation } from "@happysanta/router";
+import {
+  useAdaptivity,
+  useAppearance,
+  useInsets,
+} from "@vkontakte/vk-bridge-react";
 import {
   AdaptivityProvider,
   AppRoot,
@@ -11,70 +18,83 @@ import bridge, {
   AppearanceType,
   parseURLSearchParamsForGetLaunchParams,
 } from "@vkontakte/vk-bridge";
-import { useLocation } from "@happysanta/router";
-import {
-  useAdaptivity,
-  useAppearance,
-  useInsets,
-} from "@vkontakte/vk-bridge-react";
-import "markdown-it-latex/dist/index.css";
 
+// Styles
+import "markdown-it-latex/dist/index.css";
 import "@vkontakte/vkui/dist/vkui.css";
 import "./index.css";
 
+// Core entities and services
 import { vkUserModel } from "./entity/user";
 import { online } from "./api/online";
+import { appService } from "$/services/AppService";
+import { transformVKBridgeAdaptivity } from "$/utility/strings";
 
+// Theme components
 import { OneDark } from "./OneDark";
 import { OneLight } from "./OneLight";
+
+// Routing
 import { Modals, Panels, Views } from "./entity/routing";
 
+// Navigation and utilities
+import { useNavigationContext } from "./NavigationContext";
+import { SnackbarNotifier } from "./components/SnackbarNotifier";
+import UtilBlock from "./UtilBlock";
+
+// Main panels
 import { Home } from "./panels/Home";
 import { Chapters } from "./panels/Chapters";
 import { History } from "./panels/History";
 import { Modes } from "./panels/Modes";
-
-import { useNavigationContext } from "./NavigationContext";
-import { SnackbarNotifier } from "./components/SnackbarNotifier";
 import { ChatSettings } from "./panels/ChatSettings";
-import { ApplicationInfo } from "./modals/ApplicationInfo";
+import { LoadingPanel } from "$/panels/LoadingPanel";
+
+// Chat panels
 import { ChatFree } from "./panels/ChatFree";
 import { ChatLesson } from "./panels/ChatLesson";
 import { ChatInterview } from "./panels/ChatInterview";
-import { InterviewQuestions } from "./modals/InterviewQuestions";
-import { LeetcodeProblems } from "./panels/LeetCodeProblems";
 import { ChatLeetCode } from "./panels/ChatLeetCode";
-import { ProblemDetail } from "./panels/ProblemDetail";
-import { AppAlert } from "./modals/AppAlert";
-import { CodeEditor } from "./panels/CodeEditor";
 import { ChatTrainer } from "./panels/ChatTrainer";
-import { ImageGenerationResult } from "./panels/ImageGenerationResult";
-import UtilBlock from "./UtilBlock";
 
-import { appService } from "$/services/AppService";
-import { LoadingPanel } from "$/panels/LoadingPanel";
+// LeetCode panels
+import { LeetcodeProblems } from "./panels/LeetCodeProblems";
+import { ProblemDetail } from "./panels/ProblemDetail";
+
+// Code editor
+import { CodeEditor } from "./panels/CodeEditor";
+
+// Image generation panels
 import { ImageGeneration } from "$/panels/ImageGeneration";
+import { ImageGenerationResult } from "./panels/ImageGenerationResult";
 import { ImageGenerationExamples } from "$/panels/ImageGenerationExamples";
 import Gallery from "$/panels/Gallery";
 import ImageCreatePrompts from "$/panels/ImageCreatePrompts";
-import Profile from "$/panels/Profile";
-import ApplicationInfoStableArt from "./modals/ApplicationInfoStableArt/ApplicationInfoStableArt";
 import { PublishingImages } from "$/panels/PublishingImages";
-import { Agreement } from "$/modals/Agreement";
-import { DetailImage } from "$/modals/DetailImage";
-import { WeakRequestModal } from "$/modals/WeakRequestModal";
+
+// Profile panels
+import Profile from "$/panels/Profile";
 import { GPTutorProfile } from "$/panels/GPTutorProfile";
-import { transformVKBridgeAdaptivity } from "$/utility/strings";
+
+// Other feature panels
 import { MermaidPage } from "$/panels/MermaidPage";
 import { AdditionalRequests } from "$/panels/AdditionalRequests";
 import { AnecdoteMain } from "$/panels/AnecdoteMain";
 import AnecdoteGeneration from "./panels/AnecdoteGeneration/AnecdoteGeneration";
 import { AnecdoteNews } from "$/panels/AnecdoteNews";
-import ApplicationInfoHumor from "./modals/ApplicationInfoHumor/ApplicationInfoHumor";
 import { BingPanel } from "$/panels/BingPanel";
 import VKDocQuestionPanel from "./panels/VKDocQuestionPanel/VKDocQestionPanel";
 import { VkDocQuestionRequest } from "$/panels/VkDocQuestionRequest";
-import { retrieveLaunchParams } from "@telegram-apps/sdk";
+
+// Modals
+import { ApplicationInfo } from "./modals/ApplicationInfo";
+import ApplicationInfoStableArt from "./modals/ApplicationInfoStableArt/ApplicationInfoStableArt";
+import ApplicationInfoHumor from "./modals/ApplicationInfoHumor/ApplicationInfoHumor";
+import { InterviewQuestions } from "./modals/InterviewQuestions";
+import { Agreement } from "$/modals/Agreement";
+import { DetailImage } from "$/modals/DetailImage";
+import { WeakRequestModal } from "$/modals/WeakRequestModal";
+import { AppAlert } from "./modals/AppAlert";
 
 const App = () => {
   const location = useLocation();

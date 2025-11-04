@@ -14,8 +14,11 @@ import java.io.IOException;
 
 @RestController
 public class ConversationController {
-    @Autowired
-    ConversationsService conversationsService;
+    private final ConversationsService conversationsService;
+    
+    public ConversationController(ConversationsService conversationsService) {
+        this.conversationsService = conversationsService;
+    }
 
     @PostMapping(path = "/vk-doc/conversation")
     public String getConversationVkDoc(@RequestBody QuestionRequest questionRequest) {
@@ -23,8 +26,8 @@ public class ConversationController {
     }
 
     @PostMapping(path = "/conversation", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public <T> T getConversation(@RequestBody ConversationRequest conversationRequest, HttpServletRequest request) throws IOException {
-        return (T) conversationsService.getConversation(conversationRequest, (String) request.getAttribute("vkUserId"));
+    public Object getConversation(@RequestBody ConversationRequest conversationRequest, HttpServletRequest request) throws IOException {
+        return conversationsService.getConversation(conversationRequest, (String) request.getAttribute("vkUserId"));
     }
 
 }
