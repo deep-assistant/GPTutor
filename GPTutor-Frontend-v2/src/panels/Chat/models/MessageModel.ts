@@ -63,7 +63,6 @@ export class MessageModel {
   citations: string[] = []; // Список URL цитирований
   annotations: UrlCitation[] = []; // Аннотации с деталями цитирований
   isTyping: boolean;
-  isStreaming: boolean = false; // Идет генерация ответа
   timestamp: Date;
   usage: MessageUsage | null = null;
   images?: ImageAttachment[]; // Изображения от пользователя (входящие)
@@ -84,12 +83,12 @@ export class MessageModel {
     this.isTyping = isTyping;
     this.timestamp = new Date();
     this.attachedFilesList = attachedFiles;
-
+    
     // Преобразуем attachedFiles в images и files для API
     if (attachedFiles && attachedFiles.length > 0) {
       this.images = [];
       this.files = [];
-
+      
       for (const file of attachedFiles) {
         if (file.type.startsWith('image/')) {
           this.images.push({
@@ -162,13 +161,6 @@ export class MessageModel {
    */
   setIsTyping(isTyping: boolean) {
     this.isTyping = isTyping;
-  }
-
-  /**
-   * Установить статус потоковой загрузки
-   */
-  setIsStreaming(isStreaming: boolean) {
-    this.isStreaming = isStreaming;
   }
 
   /**

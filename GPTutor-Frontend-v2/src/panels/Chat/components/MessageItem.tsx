@@ -176,19 +176,17 @@ export const MessageItem: React.FC<MessageItemProps> = observer(
           paddingRight: "16px",
         }}
       >
-        {!message.isStreaming && (
-          <div
-            style={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
-              opacity: 0.6,
-              zIndex: 1,
-            }}
-          >
-            <CopyButton textToCopy={message.content} />
-          </div>
-        )}
+        <div
+          style={{
+            position: "absolute",
+            top: "8px",
+            right: "8px",
+            opacity: 0.6,
+            zIndex: 1,
+          }}
+        >
+          <CopyButton textToCopy={message.content} />
+        </div>
         <div
           style={{
             display: "flex",
