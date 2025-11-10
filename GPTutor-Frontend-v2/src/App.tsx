@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Epic,
   ModalRoot,
@@ -8,6 +8,7 @@ import {
   TabbarItem,
   View,
 } from "@vkontakte/vkui";
+import { parseURLSearchParamsForGetLaunchParams } from "@vkontakte/vk-bridge";
 import {
   useActiveVkuiLocation,
   useRouteNavigator,
@@ -37,6 +38,15 @@ export const App = () => {
 
   const vkAppearance = useAppearance();
   const isDarkTheme = vkAppearance === "dark";
+  const { vk_platform } = useMemo(
+    () =>
+      parseURLSearchParamsForGetLaunchParams(window.location.search) ?? {
+        vk_platform: undefined,
+      },
+    []
+  );
+  const isVkMobile =
+    vk_platform?.startsWith("mobile") || vk_platform === "mobile_web";
 
   useEffect(() => {
     userViewModel.getUser();
@@ -57,7 +67,7 @@ export const App = () => {
               activeStory={activeView || "home"}
               tabbar={
                 activeView !== "chat" ? (
-                  <Tabbar>
+                  <Tabbar style={isVkMobile ? { paddingBottom: 8 } : undefined}>
                     <TabbarItem
                       selected={activeView === "home" || !activeView}
                       onClick={() => routeNavigator.push("/")}
