@@ -4,12 +4,20 @@ import { Button } from "@vkontakte/vkui";
 import { Icon16CopyOutline } from "@vkontakte/icons";
 import bridge from "@vkontakte/vk-bridge";
 
-export const useCodeCopyButtons = (isTyping: boolean) => {
+export const useCodeCopyButtons = (
+  isTyping: boolean,
+  isStreaming: boolean
+) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const renderCopyButton = (code: string, blockId: string) => {
+  const renderCopyButton = (
+    code: string,
+    blockId: string,
+    disabled: boolean
+  ) => {
     return renderToString(
       <div
+        className="code-copy-button-container"
         style={{
           display: "flex",
           marginTop: "4px",
@@ -28,7 +36,10 @@ export const useCodeCopyButtons = (isTyping: boolean) => {
             fontSize: "12px",
             padding: "4px 8px",
             minHeight: "24px",
+            cursor: disabled ? "not-allowed" : "pointer",
+            opacity: disabled ? 0.5 : 1,
           }}
+          disabled={disabled}
         >
           Копировать код
         </Button>
@@ -57,7 +68,11 @@ export const useCodeCopyButtons = (isTyping: boolean) => {
           codeElement.textContent || codeElement.innerText || "";
         const blockId = `code-block-${index}`;
 
-        const buttonHtml = renderCopyButton(cleanCode, blockId);
+        const buttonHtml = renderCopyButton(
+          cleanCode,
+          blockId,
+          isStreaming
+        );
 
         // Создаем временный контейнер для парсинга HTML
         const tempDiv = document.createElement("div");
@@ -92,7 +107,22 @@ export const useCodeCopyButtons = (isTyping: boolean) => {
     const timer = setTimeout(addCopyButtons, 500);
 
     return () => clearTimeout(timer);
-  }, [isTyping]);
+  }, [isTyping, isStreaming]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const buttons =
+      containerRef.current.querySelectorAll<HTMLButtonElement>(
+        ".code-copy-button"
+      );
+
+    buttons.forEach((button) => {
+      button.disabled = isStreaming;
+      button.style.cursor = isStreaming ? "not-allowed" : "pointer";
+      button.style.opacity = isStreaming ? "0.5" : "1";
+    });
+  }, [isStreaming]);
 
   return containerRef;
 };

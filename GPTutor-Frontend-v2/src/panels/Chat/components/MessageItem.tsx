@@ -28,7 +28,10 @@ const markdown = new Markdown();
 
 export const MessageItem: React.FC<MessageItemProps> = observer(
   ({ message, userViewModel, getUserName }) => {
-    const containerRef = useCodeCopyButtons(message.isTyping);
+    const containerRef = useCodeCopyButtons(
+      message.isTyping,
+      message.isStreaming
+    );
     const routeNavigator = useRouteNavigator();
 
     // Состояние загрузки изображений: imageIndex -> uploading
