@@ -1,0 +1,64 @@
+.file-upload-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.file-upload-button {
+  color: var(--vkui--color_icon_secondary);
+  transition: color 0.2s ease;
+}
+
+.file-upload-button:hover:not(:disabled) {
+  color: var(--vkui--color_icon_accent);
+}
+
+.file-upload-container.disabled .file-upload-button {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.file-upload-button[data-write-bar-icon] {
+  cursor: pointer;
+}
+
+.file-upload-button[data-write-bar-icon]:disabled {
+  cursor: not-allowed;
+}
+
+.drag-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.drag-overlay-content {
+  background: var(--vkui--color_background);
+  padding: 24px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 2px dashed var(--vkui--color_icon_accent);
+}
+
+.drag-overlay-content svg {
+  color: var(--vkui--color_icon_accent);
+  font-size: 48px;
+}
+
+.drag-overlay-content span {
+  color: var(--vkui--color_text_primary);
+  font-size: 16px;
+  font-weight: 500;
+}

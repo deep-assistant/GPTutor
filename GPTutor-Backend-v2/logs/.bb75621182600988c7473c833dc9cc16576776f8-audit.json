@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "G:\\project\\GPTutor\\GPTutor-Backend-v2\\logs\\.bb75621182600988c7473c833dc9cc16576776f8-audit.json",
+    "files": [
+        {
+            "date": 1759226270951,
+            "name": "G:\\project\\GPTutor\\GPTutor-Backend-v2\\logs\\error-2025-09-30.log",
+            "hash": "3199b1428544ccc2a696eab3d225f1c17866c130a4ed6f48f356fd7cde1e39fb"
+        },
+        {
+            "date": 1759307305690,
+            "name": "G:\\project\\GPTutor\\GPTutor-Backend-v2\\logs\\error-2025-10-01.log",
+            "hash": "b6ef795f6af1e3b5eb697a91ced135f259dbc2fa761968ea1317fa23ea7bf2d7"
+        }
+    ],
+    "hashType": "sha256"
+}

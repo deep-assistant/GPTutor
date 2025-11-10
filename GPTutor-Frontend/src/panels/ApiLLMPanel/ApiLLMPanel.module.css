@@ -1,0 +1,370 @@
+.container {
+    width: 100vw;
+}
+
+.containerPlaceholder {
+    width: 100vw;
+    height: 100%;
+}
+
+.apiCode {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.copyIcon {
+    background: var(--vkui--color_background_modal);
+    color: var(--vkui--color_text_accent_themed);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.copyIcon:hover {
+    background: var(--vkui--color_background_accent_themed);
+    color: var(--vkui--color_text_contrast_themed);
+}
+
+.cardApi {
+    width: 100%;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.cardProfile {
+    display: grid;
+}
+
+.cardName {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.subtitleText {
+    color: var(--vkui--color_text_secondary);
+}
+
+/* Новые стили для API панели */
+.errorCard {
+    border-color: var(--vkui--color_stroke_negative);
+    background: var(--vkui--color_background_negative_tint);
+}
+
+.errorHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.responseHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    justify-content: space-between;
+}
+
+.responseText {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: 1.5;
+    padding: 12px;
+    background: var(--vkui--color_background_secondary);
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.codeHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--vkui--color_separator_primary);
+}
+
+.codeBlock {
+    background: var(--vkui--color_background_secondary);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+    border: 1px solid var(--vkui--color_separator_primary);
+}
+
+.codeBlock code {
+    color: var(--vkui--color_text_primary);
+    background: none;
+    padding: 0;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+/* Стили для табов */
+.tabContent {
+    padding-bottom: 80px;
+}
+
+/* Улучшенные стили для слайдеров */
+.sliderContainer {
+    padding: 8px 0;
+}
+
+.parameterDescription {
+    color: var(--vkui--color_text_secondary);
+    font-size: 14px;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+/* Стили для форм */
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.apiKeyInput {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fadeIn {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .codeBlock {
+        font-size: 12px;
+        padding: 12px;
+    }
+    
+    .responseText {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+/* Улучшенные стили для карточек */
+.apiCard {
+    transition: all 0.2s ease;
+    border-radius: 12px;
+}
+
+.apiCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для статусных индикаторов */
+.statusSuccess {
+    color: var(--vkui--color_text_positive);
+}
+
+.statusError {
+    color: var(--vkui--color_text_negative);
+}
+
+.statusPending {
+    color: var(--vkui--color_text_secondary);
+}
+
+/* Стили для баланса */
+.balanceCard {
+    background: linear-gradient(135deg, var(--vkui--color_background_accent_themed) 0%, var(--vkui--color_background_accent_tint_themed) 100%);
+    border: none;
+}
+
+.balanceHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.balanceSubtitle {
+    color: var(--vkui--color_text_secondary);
+    margin-top: 2px;
+}
+
+.balanceActions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.costEstimate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--vkui--color_background_warning_tint);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+/* Стили для примеров */
+.examplesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.exampleCard {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.exampleCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.exampleHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.exampleDescription {
+    color: var(--vkui--color_text_secondary);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Улучшенные стили для кода */
+.codeActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.downloadIcon {
+    background: var(--vkui--color_background_positive_tint);
+    color: var(--vkui--color_text_positive);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.downloadIcon:hover {
+    background: var(--vkui--color_background_positive_themed);
+    color: var(--vkui--color_text_contrast_themed);
+}
+
+/* Улучшенный код блок */
+.codeBlock {
+    background: var(--vkui--color_background_secondary);
+    border-radius: 12px;
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+    border: 1px solid var(--vkui--color_separator_primary);
+    position: relative;
+}
+
+.codeBlock::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    border-radius: 12px 12px 0 0;
+}
+
+/* Улучшенные стили для заголовков кода */
+.codeHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--vkui--color_separator_primary);
+}
+
+/* Стили для мобильных устройств */
+@media (max-width: 768px) {
+    .examplesGrid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .balanceHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .codeActions {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* Анимация для карточек */
+.fadeInUp {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для статистики использования */
+.usageStats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--vkui--color_background_secondary);
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.statItem {
+    text-align: center;
+}
+
+.statValue {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--vkui--color_text_primary);
+}
+
+.statLabel {
+    font-size: 12px;
+    color: var(--vkui--color_text_secondary);
+    margin-top: 2px;
+}

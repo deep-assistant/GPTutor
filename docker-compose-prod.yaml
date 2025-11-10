@@ -1,124 +1,72 @@
-version: '3.3'
+version: '3.8'
 
 services:
-  frontend-gptutor-prod-tg:
+  frontend-prod:
     env_file:
       - .env
     build:
-      context: GPTutor-Frontend
+      context: GPTutor-Frontend-v2
       dockerfile: Dockerfile
       args:
-        REACT_APP_PLATFORM: "TG"
-        REACT_APP: 'GPTutor'
-        REACT_APP_BACKEND_HOST: 'https://prod.${HOST}/'
-        REACT_APP_BACKEND_HOST_WS: "wss://prod.${HOST}/websocket/"
-    container_name: frontend-gptutor-prod-tg
+        VITE_API_URL: 'https://api.${HOST}'
+        VITE_VK_APP_ID: '${VK_APP_ID}'
+    container_name: frontend-prod
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend-gptutor-prod-tg.rule=Host(`deep-gpt.prod.${HOST}`)"
-      - "traefik.http.routers.frontend-gptutor-prod-tg.entrypoints=websecure"
-      - "traefik.http.routers.frontend-gptutor-prod-tg.tls.certresolver=myresolver"
+      - "traefik.http.routers.frontend-prod.rule=Host(`front.${HOST}`)"
+      - "traefik.http.routers.frontend-prod.entrypoints=websecure"
+      - "traefik.http.routers.frontend-prod.tls.certresolver=myresolver"
     networks:
       - trfk
-
-  frontend-gptutor-prod:
-    env_file:
-      - .env
-    build:
-      context: GPTutor-Frontend
-      dockerfile: Dockerfile
-      args:
-        REACT_APP_PLATFORM: "VK"
-        REACT_APP: 'GPTutor'
-        REACT_APP_BACKEND_HOST: 'https://prod.${HOST}/'
-        REACT_APP_BACKEND_HOST_WS: "wss://prod.${HOST}/websocket/"
-    container_name: frontend-gptutor-prod
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend-gptutor-prod.rule=Host(`gptutor.prod.${HOST}`)"
-      - "traefik.http.routers.frontend-gptutor-prod.entrypoints=websecure"
-      - "traefik.http.routers.frontend-gptutor-prod.tls.certresolver=myresolver"
-    networks:
-      - trfk
-
-  frontend-stable-art-prod:
-    env_file:
-      - .env
-    build:
-      context: GPTutor-Frontend
-      dockerfile: Dockerfile
-      args:
-        REACT_APP_PLATFORM: "VK"
-        REACT_APP: 'Stable Art'
-        REACT_APP_BACKEND_HOST: 'https://prod.${HOST}/'
-        REACT_APP_BACKEND_HOST_WS: "wss://prod.${HOST}/websocket/"
-    container_name: frontend-stable-art-prod
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend-stable-art-prod.rule=Host(`stable-art.prod.${HOST}`)"
-      - "traefik.http.routers.frontend-stable-art-prod.entrypoints=websecure"
-      - "traefik.http.routers.frontend-stable-art-prod.tls.certresolver=myresolver"
-    networks:
-      - trfk
-
-  frontend-ai-humor-prod:
-    env_file:
-      - .env
-    build:
-      context: GPTutor-Frontend
-      dockerfile: Dockerfile
-      args:
-        REACT_APP_PLATFORM: "VK"
-        REACT_APP: 'AiHumor'
-        REACT_APP_BACKEND_HOST: 'https://prod.${HOST}/'
-        REACT_APP_BACKEND_HOST_WS: "wss://prod.${HOST}/websocket/"
-    container_name: frontend-ai-humor-prod
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ai-humor-stage.rule=Host(`ai-humor.prod.${HOST}`)"
-      - "traefik.http.routers.ai-humor-stage.entrypoints=websecure"
-      - "traefik.http.routers.ai-humor-stage.tls.certresolver=myresolver"
-    networks:
-      - trfk
+    restart: unless-stopped
 
   backend-prod:
     env_file:
       - .env
       - .env-prod
-    build: ./GPTutor-Backend
+    build:
+      context: ./GPTutor-Backend-v2
+      dockerfile: Dockerfile
     container_name: backend-prod
-    depends_on:
-      - postgresql-prod
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=file:/app/data/prod.db
+
+    volumes:
+      - backend-db:/app/data
+      - backend-logs:/app/logs
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend-prod.rule=Host(`prod.${HOST}`)"
+      - "traefik.http.routers.backend-prod.rule=Host(`api.${HOST}`)"
       - "traefik.http.routers.backend-prod.entrypoints=websecure"
       - "traefik.http.routers.backend-prod.tls.certresolver=myresolver"
+      - "traefik.http.services.backend-prod.loadbalancer.server.port=3001"
+      - "traefik.http.middlewares.backend-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
     networks:
       - trfk
+    restart: unless-stopped
 
-  models-prod:
-    env_file:
-      - .env-prod
-    container_name: models-prod
+  docs-prod:
     build:
-      context: GPTutor-Models
+      context: ./GPTutor-Backend-v2/docs
       dockerfile: Dockerfile
+    container_name: docs-prod
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.docs-prod.rule=Host(`docs.${HOST}`)"
+      - "traefik.http.routers.docs-prod.entrypoints=websecure"
+      - "traefik.http.routers.docs-prod.tls.certresolver=myresolver"
+      - "traefik.http.services.docs-prod.loadbalancer.server.port=8080"
     networks:
       - trfk
-
-  postgresql-prod:
-    image: 'postgres:13.1-alpine'
-    container_name: postgresql-prod
-    env_file:
-      - .env-prod
-    volumes:
-      - db-data-prod:/var/lib/postgresql/data
-    networks:
-      - trfk
+    restart: unless-stopped
 
 volumes:
-  db-data-prod:
+  backend-db:
+    driver: local
+  backend-logs:
+    driver: local
 
 networks:
   trfk:

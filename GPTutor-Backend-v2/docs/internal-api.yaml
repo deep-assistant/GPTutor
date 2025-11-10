@@ -1,0 +1,986 @@
+openapi: 3.0.3
+info:
+  title: GPTutor Internal API
+  version: 2.0.0
+  description: |
+    # GPTutor Internal API
+
+    Внутренние административные endpoints для управления системой GPTutor.
+    
+    **⚠️ ВНИМАНИЕ:** Этот API предназначен только для внутреннего использования администраторами системы.
+    
+    ## Доступные роуты
+
+    ### Health Check
+    - `GET /health` - Проверка состояния сервера
+
+    ### Аутентификация
+    - `GET /user` - Получить данные пользователя
+    - `POST /update-token` - Обновление API токена пользователя
+
+    ### Модели
+    - `GET /v1/models` - Получение списка доступных моделей
+
+    ### Chat Completions
+    - `POST /v1/chat/completions` - Создание chat completion
+
+    ### Files
+    - `POST /upload` - Загрузка файла в S3
+    - `GET /files` - Получение списка файлов пользователя
+    - `DELETE /files/:fileId` - Удаление файла
+
+    ## Безопасность
+
+    Все endpoints требуют соответствующей авторизации:
+    - **VK Auth** - для административных операций
+    - **API Key** - для пользовательских операций
+
+servers:
+  - url: http://localhost:3001
+    description: Development server
+  - url: https://api.gptutor.site
+    description: Production server
+
+paths:
+  /health:
+    get:
+      tags: [System]
+      summary: Health Check
+      description: |
+        Проверяет состояние сервера и возвращает базовую информацию о системе.
+        
+        **Использование:**
+        - Мониторинг состояния сервера
+        - Проверка доступности API
+        - Load balancer health checks
+      responses:
+        '200':
+          description: Сервер работает нормально
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: "ok"
+                        description: "Статус сервера"
+                      timestamp:
+                        type: string
+                        format: date-time
+                        example: "2024-01-15T10:30:00Z"
+                        description: "Время проверки"
+              examples:
+                healthy:
+                  summary: Сервер работает
+                  value:
+                    success: true
+                    data:
+                      status: "ok"
+                      timestamp: "2024-01-15T10:30:00Z"
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user:
+    get:
+      tags: [Authentication]
+      summary: Получить данные пользователя
+      description: |
+        Получает информацию о пользователе, включая баланс, API ключ и данные VK.
+        
+        **Использование:**
+        - Получение данных пользователя
+        - Проверка баланса
+        - Получение API ключа
+        - Просмотр VK данных пользователя
+        
+        **Требует:** VK подпись в заголовке Authorization
+      security:
+        - VkAuth: []
+      responses:
+        '200':
+          description: Данные пользователя получены успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "VK authorization successful!"
+                      vkData:
+                        type: object
+                        description: "Данные от VK"
+                        properties:
+                          vk_user_id:
+                            type: string
+                          vk_app_id:
+                            type: string
+                          vk_is_app_user:
+                            type: string
+                          vk_language:
+                            type: string
+                          vk_platform:
+                            type: string
+                          vk_ts:
+                            type: string
+                      dbUser:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: "ID пользователя в БД"
+                          vkId:
+                            type: string
+                            description: "VK ID пользователя"
+                          balance:
+                            type: number
+                            description: "Баланс пользователя"
+                          apiKey:
+                            type: string
+                            description: "API ключ пользователя"
+                          isActive:
+                            type: boolean
+                            description: "Активен ли пользователь"
+                          createdAt:
+                            type: string
+                            format: date-time
+                            description: "Дата создания"
+                          updatedAt:
+                            type: string
+                            format: date-time
+                            description: "Дата обновления"
+                      timestamp:
+                        type: string
+                        format: date-time
+              examples:
+                success:
+                  summary: Успешная VK авторизация
+                  value:
+                    success: true
+                    data:
+                      message: "VK authorization successful!"
+                      vkData:
+                        vk_user_id: "123456789"
+                        vk_app_id: "51602327"
+                        vk_is_app_user: "1"
+                        vk_language: "ru"
+                        vk_platform: "web"
+                        vk_ts: "1642234567"
+                      dbUser:
+                        id: "user_abc123"
+                        vkId: "123456789"
+                        balance: 10.5
+                        apiKey: "sk-abc123..."
+                        isActive: true
+                        createdAt: "2024-01-01T00:00:00Z"
+                        updatedAt: "2024-01-15T10:30:00Z"
+                      timestamp: "2024-01-15T10:30:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /update-token:
+    post:
+      tags: [Authentication]
+      summary: Обновление API токена
+      description: |
+        Генерирует новый API ключ для пользователя. Старый ключ становится недействительным.
+        
+        **Использование:**
+        - Обновление скомпрометированного API ключа
+        - Ротация ключей безопасности
+        - Административное управление пользователями
+        
+        **Требует:** VK авторизацию
+      security:
+        - VkAuth: []
+      responses:
+        '200':
+          description: Токен успешно обновлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "API token updated successfully!"
+                      newApiKey:
+                        type: string
+                        description: "Новый API ключ"
+                        example: "sk-abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567890"
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: "ID пользователя"
+                          vkId:
+                            type: string
+                            description: "VK ID пользователя"
+                          balance:
+                            type: number
+                            description: "Баланс пользователя"
+                          isActive:
+                            type: boolean
+                            description: "Активен ли пользователь"
+                          updatedAt:
+                            type: string
+                            format: date-time
+                            description: "Время обновления"
+                      timestamp:
+                        type: string
+                        format: date-time
+              examples:
+                success:
+                  summary: Успешное обновление токена
+                  value:
+                    success: true
+                    data:
+                      message: "API token updated successfully!"
+                      newApiKey: "sk-abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567890"
+                      user:
+                        id: "user_123"
+                        vkId: "vk_456"
+                        balance: 10.5
+                        isActive: true
+                        updatedAt: "2024-01-15T10:30:00Z"
+                      timestamp: "2024-01-15T10:30:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/models:
+    get:
+      tags: [Models]
+      summary: Получение списка моделей
+      description: |
+        Возвращает список всех доступных AI моделей с информацией о ценах и провайдерах.
+        
+        **Использование:**
+        - Получение актуального списка моделей
+        - Проверка доступности моделей
+        - Анализ цен на модели
+        
+        **Особенности:**
+        - Модели сортируются по цене (самые дорогие сверху)
+        - Включает информацию о провайдерах
+        - Показывает время последнего обновления
+      responses:
+        '200':
+          description: Список моделей успешно получен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      models:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Model'
+                        description: "Список доступных моделей"
+                      total:
+                        type: integer
+                        description: "Общее количество моделей"
+                        example: 150
+                      providers:
+                        type: array
+                        items:
+                          type: string
+                        description: "Список провайдеров"
+                        example: ["x-ai", "deepseek", "google", "qwen", "perplexity", "mistralai", "openai"]
+                      lastUpdated:
+                        type: string
+                        format: date-time
+                        description: "Время последнего обновления"
+              examples:
+                success:
+                  summary: Успешное получение моделей
+                  value:
+                    success: true
+                    data:
+                      models:
+                        - id: "openai/gpt-4o"
+                          name: "GPT-4o"
+                          description: "Most capable GPT-4 model"
+                          pricing_rub:
+                            prompt: 0.15
+                            completion: 0.6
+                          context_length: 128000
+                          created: 1642234567
+                      total: 150
+                      providers: ["openai", "anthropic", "google", "deepseek"]
+                      lastUpdated: "2024-01-15T10:30:00Z"
+        '503':
+          description: Сервис моделей недоступен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                service_unavailable:
+                  summary: Сервис недоступен
+                  value:
+                    error: "Models service not ready"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/chat/completions:
+    post:
+      tags: [Chat Completions]
+      summary: Создание chat completion
+      description: |
+        Создает completion для чата с поддержкой streaming и автоматическим выбором модели.
+        
+        **Использование:**
+        - Генерация ответов от AI
+        - Streaming режим для реального времени
+        - Автоматический fallback между моделями
+        
+        **Особенности:**
+        - Поддержка streaming режима
+        - Автоматический расчет стоимости
+        - Fallback на другие модели при ошибках
+        - Поддержка всех параметров OpenAI API
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+            examples:
+              simple:
+                summary: Простой запрос
+                value:
+                  model: "google/gemini-2.5-flash-lite"
+                  messages:
+                    - role: "user"
+                      content: "Привет! Как дела?"
+              streaming:
+                summary: Streaming запрос
+                value:
+                  model: "google/gemini-2.5-flash-lite"
+                  messages:
+                    - role: "user"
+                      content: "Расскажи историю"
+                  stream: true
+                  max_tokens: 150
+              advanced:
+                summary: Продвинутый запрос
+                value:
+                  model: "anthropic/claude-3-haiku"
+                  messages:
+                    - role: "user"
+                      content: "Объясни квантовую физику простыми словами"
+                  max_tokens: 500
+                  temperature: 0.7
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+            text/event-stream:
+              schema:
+                type: string
+              description: |
+                Streaming ответ в формате Server-Sent Events:
+                ```
+                data: {"choices":[{"delta":{"content":"Hello"}}]}
+                data: {"choices":[{"delta":{"content":" there!"}}]}
+                data: [DONE]
+                ```
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          description: Недостаточно средств
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                insufficient_balance:
+                  summary: Недостаточно средств
+                  value:
+                    error: "Insufficient balance"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /upload:
+    post:
+      tags: [Files]
+      summary: Загрузка файла в S3
+      description: |
+        Загружает файл в Yandex Object Storage с автоматической оптимизацией.
+        
+        **Использование:**
+        - Загрузка изображений с оптимизацией
+        - Загрузка документов с сжатием
+        - Загрузка текстовых файлов
+        
+        **Особенности:**
+        - Автоматическая оптимизация изображений (качество 60%)
+        - Сжатие PDF файлов
+        - Поддержка файлов до 50MB
+        - Генерация уникальных имен файлов
+        
+        **Поддерживаемые типы:**
+        - **Изображения:** jpg, jpeg, png, gif, bmp, svg, webp, tiff
+        - **Документы:** pdf, doc, docx, xls, xlsx, csv
+        - **Текстовые:** txt, js, html, css, json, xml, md, log, py, java, c, cpp, sql
+      security:
+        - VkAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Файл для загрузки"
+            examples:
+              image:
+                summary: Загрузка изображения
+                value:
+                  file: "image.jpg"
+              document:
+                summary: Загрузка документа
+                value:
+                  file: "document.pdf"
+      responses:
+        '200':
+          description: Файл успешно загружен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "File uploaded successfully!"
+                      file:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: "ID файла в БД"
+                          name:
+                            type: string
+                            description: "Оригинальное имя файла"
+                          type:
+                            type: string
+                            description: "MIME тип файла"
+                          url:
+                            type: string
+                            description: "URL файла в S3"
+                          size:
+                            type: integer
+                            description: "Размер файла в байтах"
+                          createdAt:
+                            type: string
+                            format: date-time
+                            description: "Время загрузки"
+                      timestamp:
+                        type: string
+                        format: date-time
+              examples:
+                success:
+                  summary: Успешная загрузка
+                  value:
+                    success: true
+                    data:
+                      message: "File uploaded successfully!"
+                      file:
+                        id: "file_abc123"
+                        name: "document.pdf"
+                        type: "application/pdf"
+                        url: "https://gptutor-bucket.storage.yandexcloud.net/uuid.pdf"
+                        size: 1024000
+                        createdAt: "2024-01-15T10:30:00Z"
+                      timestamp: "2024-01-15T10:30:00Z"
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                no_file:
+                  summary: Файл не предоставлен
+                  value:
+                    error: "No file provided"
+                unsupported_type:
+                  summary: Неподдерживаемый тип файла
+                  value:
+                    error: "Unsupported file type"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '413':
+          description: Файл слишком большой
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                file_too_large:
+                  summary: Файл превышает лимит
+                  value:
+                    error: "File too large. Maximum size is 50MB"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /files:
+    get:
+      tags: [Files]
+      summary: Получение списка файлов пользователя
+      description: |
+        Возвращает список всех файлов, загруженных пользователем.
+        
+        **Использование:**
+        - Просмотр загруженных файлов
+        - Получение метаданных файлов
+        - Управление файлами пользователя
+      security:
+        - VkAuth: []
+      responses:
+        '200':
+          description: Список файлов успешно получен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Files retrieved successfully!"
+                      files:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: "ID файла"
+                            name:
+                              type: string
+                              description: "Имя файла"
+                            type:
+                              type: string
+                              description: "MIME тип"
+                            url:
+                              type: string
+                              description: "URL файла"
+                            size:
+                              type: integer
+                              description: "Размер в байтах"
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: "Время загрузки"
+                      total:
+                        type: integer
+                        description: "Общее количество файлов"
+                      timestamp:
+                        type: string
+                        format: date-time
+              examples:
+                success:
+                  summary: Список файлов
+                  value:
+                    success: true
+                    data:
+                      message: "Files retrieved successfully!"
+                      files:
+                        - id: "file_abc123"
+                          name: "document.pdf"
+                          type: "application/pdf"
+                          url: "https://gptutor-bucket.storage.yandexcloud.net/uuid.pdf"
+                          size: 1024000
+                          createdAt: "2024-01-15T10:30:00Z"
+                        - id: "file_def456"
+                          name: "image.jpg"
+                          type: "image/jpeg"
+                          url: "https://gptutor-bucket.storage.yandexcloud.net/uuid2.jpg"
+                          size: 512000
+                          createdAt: "2024-01-15T11:00:00Z"
+                      total: 2
+                      timestamp: "2024-01-15T11:30:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /files/{fileId}:
+    delete:
+      tags: [Files]
+      summary: Удаление файла
+      description: |
+        Удаляет файл из S3 и базы данных.
+        
+        **Использование:**
+        - Удаление ненужных файлов
+        - Освобождение места в хранилище
+        - Управление файлами пользователя
+        
+        **Безопасность:**
+        - Пользователь может удалять только свои файлы
+        - Файл удаляется как из S3, так и из БД
+      security:
+        - VkAuth: []
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          description: "ID файла для удаления"
+          schema:
+            type: string
+            example: "file_abc123"
+      responses:
+        '200':
+          description: Файл успешно удален
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "File deleted successfully!"
+                      fileId:
+                        type: string
+                        description: "ID удаленного файла"
+                      timestamp:
+                        type: string
+                        format: date-time
+              examples:
+                success:
+                  summary: Успешное удаление
+                  value:
+                    success: true
+                    data:
+                      message: "File deleted successfully!"
+                      fileId: "file_abc123"
+                      timestamp: "2024-01-15T10:30:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Доступ запрещен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                access_denied:
+                  summary: Доступ запрещен
+                  value:
+                    error: "Access denied"
+        '404':
+          description: Файл не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                not_found:
+                  summary: Файл не найден
+                  value:
+                    error: "File not found"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      description: |
+        API ключ пользователя для доступа к LLM endpoints.
+        Формат: Bearer sk-...
+    VkAuth:
+      type: http
+      scheme: bearer
+      description: |
+        VK подпись для авторизации через VK приложение.
+        Передается в заголовке Authorization как Bearer token.
+
+  schemas:
+    Model:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Идентификатор модели"
+          example: "openai/gpt-4o"
+        name:
+          type: string
+          description: "Название модели"
+          example: "GPT-4o"
+        description:
+          type: string
+          description: "Описание модели"
+          example: "Most capable GPT-4 model"
+        pricing_rub:
+          type: object
+          properties:
+            prompt:
+              type: number
+              description: "Цена за входные токены (руб/1K токенов)"
+              example: 0.15
+            completion:
+              type: number
+              description: "Цена за выходные токены (руб/1K токенов)"
+              example: 0.6
+        context_length:
+          type: integer
+          description: "Максимальная длина контекста"
+          example: 128000
+        created:
+          type: integer
+          description: "Время создания модели (Unix timestamp)"
+          example: 1642234567
+
+    ChatCompletionRequest:
+      type: object
+      required: [messages]
+      properties:
+        model:
+          type: string
+          default: "google/gemini-2.5-flash-lite"
+          example: "google/gemini-2.5-flash-lite"
+          description: |
+            Модель для генерации ответа. Поддерживаются все модели OpenRouter.
+            
+            **Популярные модели:**
+            - `google/gemini-2.5-flash-lite` - быстрая и дешевая
+            - `anthropic/claude-3-haiku` - сбалансированная
+            - `openai/gpt-4o-mini` - OpenAI модель
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          description: "Массив сообщений для контекста"
+        max_tokens:
+          type: integer
+          minimum: 1
+          maximum: 32000
+          description: "Максимальное количество токенов в ответе"
+          example: 150
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          description: "Креативность ответа (0.0-2.0)"
+          example: 0.7
+        top_p:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: "Nucleus sampling parameter"
+          example: 0.9
+        frequency_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+          description: "Штраф за частоту повторений"
+          example: 0
+        presence_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+          description: "Штраф за присутствие токенов"
+          example: 0
+        stop:
+          type: array
+          items:
+            type: string
+          description: "Стоп-слова для завершения генерации"
+          example: ["\n\n", "Human:", "Assistant:"]
+        stream:
+          type: boolean
+          description: "Включить streaming режим"
+          example: false
+
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant]
+          description: "Роль отправителя сообщения"
+          example: "user"
+        content:
+          type: string
+          description: "Содержимое сообщения"
+          example: "Привет! Как дела?"
+
+    ChatCompletionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "Уникальный идентификатор completion"
+          example: "chatcmpl-abc123"
+        object:
+          type: string
+          description: "Тип объекта"
+          example: "chat.completion"
+        created:
+          type: integer
+          description: "Время создания (Unix timestamp)"
+          example: 1677652288
+        model:
+          type: string
+          description: "Использованная модель"
+          example: "google/gemini-2.5-flash-lite"
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+        usage:
+          $ref: '#/components/schemas/Usage'
+
+    Choice:
+      type: object
+      properties:
+        index:
+          type: integer
+          description: "Индекс выбора"
+          example: 0
+        message:
+          $ref: '#/components/schemas/ChatMessage'
+        finish_reason:
+          type: string
+          enum: [stop, length, content_filter, null]
+          description: "Причина завершения"
+          example: "stop"
+
+    Usage:
+      type: object
+      properties:
+        prompt_tokens:
+          type: integer
+          description: "Количество входных токенов"
+          example: 4
+        completion_tokens:
+          type: integer
+          description: "Количество выходных токенов"
+          example: 147
+        total_tokens:
+          type: integer
+          description: "Общее количество токенов"
+          example: 151
+        cost:
+          type: number
+          description: "Стоимость запроса в рублях"
+          example: 0.0000592
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: "Описание ошибки"
+          example: "Invalid request"
+
+  responses:
+    BadRequest:
+      description: Неверный запрос
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missing_messages:
+              summary: Отсутствует массив messages
+              value:
+                error: "messages array is required"
+            invalid_model:
+              summary: Неверная модель
+              value:
+                error: "Invalid model specified"
+
+    Unauthorized:
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            invalid_api_key:
+              summary: Неверный API ключ
+              value:
+                error: "Invalid API key or inactive user"
+            missing_api_key:
+              summary: Отсутствует API ключ
+              value:
+                error: "Missing or invalid Authorization header"
+
+    InternalError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            server_error:
+              summary: Ошибка сервера
+              value:
+                error: "Internal server error"

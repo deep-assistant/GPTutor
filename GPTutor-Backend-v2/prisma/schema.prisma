@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(cuid())
+  email    String? @unique
+  username String? @unique
+  vkId     String? @unique
+
+  balance  Float   @default(50.0)
+  apiKey   String  @unique
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  files    File[]
+  payments Payment[]
+
+  @@map("users")
+}
+
+model File {
+  id        String  @id @default(cuid())
+  userId    String
+  type      String
+  name      String
+  url       String
+  size      Int
+  notStatic Boolean @default(true)
+
+  originalName String?
+  originalSize Int?
+  converted    Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("files")
+}
+
+model Payment {
+  id              String  @id @default(cuid())
+  userId          String
+  yookassaId      String  @unique
+  amount          Float
+  currency        String  @default("RUB")
+  status          String  @default("pending") // pending, succeeded, canceled
+  description     String?
+  confirmationUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}

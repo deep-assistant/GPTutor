@@ -1,0 +1,44 @@
+{
+  "name": "gptutor-internal-docs",
+  "version": "2.0.0",
+  "description": "Внутренняя документация API для GPTutor",
+  "main": "serve-internal.js",
+  "scripts": {
+    "start": "node serve-internal.js",
+    "dev": "nodemon serve-internal.js",
+    "serve": "node serve-internal.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "gptutor",
+    "api",
+    "documentation",
+    "internal",
+    "openapi",
+    "scalar"
+  ],
+  "author": "GPTutor Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

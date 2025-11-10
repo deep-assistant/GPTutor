@@ -47,7 +47,6 @@ function AppContainer({
   const offsetHeightTabbar = tabbarElem?.offsetHeight || 0;
   const offsetHeightFixedBottom = fixedBottom?.offsetHeight || 0;
 
-  console.log(offsetHeightTabbar);
   const offset =
     offsetHeightHeader + offsetHeightTabbar + offsetHeightFixedBottom;
 
