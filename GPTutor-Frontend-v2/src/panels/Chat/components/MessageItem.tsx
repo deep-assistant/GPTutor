@@ -185,7 +185,13 @@ export const MessageItem: React.FC<MessageItemProps> = observer(
             zIndex: 1,
           }}
         >
-          <CopyButton textToCopy={message.content} />
+          <CopyButton
+            textToCopy={message.content}
+            disabled={message.isStreaming}
+            style={{
+              cursor: message.isStreaming ? "not-allowed" : "pointer",
+            }}
+          />
         </div>
         <div
           style={{

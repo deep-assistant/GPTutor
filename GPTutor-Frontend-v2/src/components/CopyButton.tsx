@@ -12,6 +12,7 @@ interface CopyButtonProps {
   onCopyError?: (error: Error) => void;
   successDuration?: number;
   size?: number;
+  disabled?: boolean;
 }
 
 export const CopyButton: FC<CopyButtonProps> = ({
@@ -21,11 +22,12 @@ export const CopyButton: FC<CopyButtonProps> = ({
   onCopyError,
   successDuration = 1500,
   size,
+  disabled = false,
 }) => {
   const [isCopied, setIsCopied] = useState(false);
 
   const handleCopy = async () => {
-    if (isCopied) return;
+    if (isCopied || disabled) return;
 
     try {
       await bridge.send("VKWebAppCopyText", { text: textToCopy });
@@ -39,9 +41,17 @@ export const CopyButton: FC<CopyButtonProps> = ({
     }
   };
 
+  const disabledStyles: React.CSSProperties = disabled
+    ? {
+        opacity: 0.4,
+        cursor: "not-allowed",
+      }
+    : {};
+
   const buttonStyle: React.CSSProperties = {
     borderRadius: "50%",
     ...style,
+    ...disabledStyles,
   };
 
   const buttonClassName = `${classes.copyButton} ${
@@ -53,6 +63,7 @@ export const CopyButton: FC<CopyButtonProps> = ({
       className={buttonClassName}
       onClick={handleCopy}
       style={buttonStyle}
+      disabled={disabled}
     >
       {isCopied ? (
         <Icon16CheckCircle
