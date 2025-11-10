@@ -156,6 +156,7 @@ class ChatViewModel {
     this.clearAttachedFiles();
 
     const assistantMessage = this.addMessage("assistant", "", true);
+    assistantMessage.setIsStreaming(true);
     this.setIsTyping(true);
     this.setIsLoading(true);
     this.setError(null);
@@ -184,6 +185,7 @@ class ChatViewModel {
       }
     } finally {
       assistantMessage.setIsTyping(false);
+      assistantMessage.setIsStreaming(false);
       this.setIsTyping(false);
       this.setIsLoading(false);
     }
