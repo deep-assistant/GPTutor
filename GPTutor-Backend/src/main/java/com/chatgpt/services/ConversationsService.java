@@ -31,11 +31,11 @@ public class ConversationsService {
     @Value("${rag.url}")
     String ragUrl;
 
-    @Value("${master-token}")
-    String masterToken;
+//     @Value("${master-token}")
+//     String masterToken;
 
-    @Value("${deep-url}")
-    String deepUrl;
+//     @Value("${deep-url}")
+//     String deepUrl;
 
     @Autowired
     ApiRequestsService apiRequestsService;
@@ -70,7 +70,7 @@ public class ConversationsService {
 
         String input = mapper.writeValueAsString(chatGptRequest);
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(deepUrl + "/v1/chat/completions"))
+                .uri(URI.create("/v1/chat/completions"))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(input))

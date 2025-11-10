@@ -1,0 +1,21 @@
+import { FastifyInstance } from 'fastify';
+import { AuthService } from '../services/AuthService';
+import { UserRepository } from '../repositories/UserRepository';
+import { FileRepository } from '../repositories/FileRepository';
+import { LLMCostEvaluate } from '../services/LLMCostEvaluate';
+import { OpenRouterService } from '../services/OpenRouterService';
+import { FilesService } from '../services/FilesService';
+export declare function registerControllers(fastify: FastifyInstance, dependencies: {
+    authService: AuthService;
+    userRepository: UserRepository;
+    fileRepository: FileRepository;
+    filesService: FilesService;
+    llmCostService: LLMCostEvaluate;
+    openRouterService: OpenRouterService;
+}): void;
+export * from './BaseController';
+export * from './HealthController';
+export * from './AuthController';
+export * from './CompletionController';
+export * from './ModelsController';
+export * from './FilesController';

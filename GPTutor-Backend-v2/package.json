@@ -1,0 +1,62 @@
+{
+  "name": "gptutor-backend-v2",
+  "version": "1.0.0",
+  "description": "GPTutor Backend v2 - Fastify + SQLite + Prisma",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "node test.js",
+    "test:rate-limits": "node scripts/test-rate-limits.js",
+    "test:rate-limit-middleware": "npx ts-node src/middleware/rateLimitMiddleware.test.ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:studio": "prisma studio",
+    "docs": "node docs/serve.js",
+    "docs:open": "node docs/serve.js & start http://localhost:8080"
+  },
+  "keywords": [
+    "fastify",
+    "prisma",
+    "sqlite",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@a2seven/yoo-checkout": "^1.1.4",
+    "@fastify/cors": "^10.0.1",
+    "@fastify/helmet": "^12.0.1",
+    "@fastify/jwt": "^9.0.1",
+    "@fastify/multipart": "^9.0.1",
+    "@fastify/rate-limit": "^10.1.1",
+    "@fastify/static": "^8.0.1",
+    "@fastify/swagger": "^9.1.0",
+    "@fastify/swagger-ui": "^5.0.1",
+    "@prisma/client": "^6.16.2",
+    "@types/uuid": "^10.0.0",
+    "@types/winston": "^2.4.4",
+    "aws-sdk": "^2.1691.0",
+    "compress-pdf": "0.5.5",
+    "crypto-js": "^4.2.0",
+    "easy-yandex-s3": "2.0.0",
+    "fastify": "^5.1.0",
+    "libreoffice-convert": "^1.7.0",
+    "openai": "^5.23.1",
+    "sharp": "^0.33.5",
+    "uuid": "^13.0.0",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^22.10.5",
+    "node-fetch": "^3.3.2",
+    "nodemon": "^3.1.9",
+    "prisma": "^6.16.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}

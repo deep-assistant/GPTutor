@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GPTutor Backend v2 API Documentation</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <script
+    id="api-reference"
+    data-url="./openapi.yaml"
+    data-configuration='{
+      "theme": "purple",
+      "layout": "modern",
+      "hideModels": false,
+      "hideDownloadButton": false,
+      "darkMode": false,
+      "searchHotKey": "k",
+      "showSidebar": true,
+      "customCss": "",
+      "hiddenClients": [],
+      "defaultHttpClient": {
+        "targetKey": "javascript",
+        "clientKey": "fetch"
+      },
+      "hooks": {
+        "onRequest": "handleStreamingRequest"
+      }
+    }'></script>
+
+  <script>
+    // // SSE-in-Scalar helper: перехватывает fetch и визуализирует text/event-stream ответы.
+    // // Вставляй в страницу Scalar (например, в <head> или внизу <body>) после загрузки UI.
+    //
+    // // --- небольшая утилита для парсинга SSE-чанкoв ---
+    // function parseSSEChunk(chunkStr, onEvent) {
+    //   // простой парсер: берет строки, ищет "data: ..." блоки, собирает event сообщения
+    //   // поддерживает множественные data: строки (склеиваем через '\n')
+    //   const lines = chunkStr.split(/\r\n|\n|\r/);
+    //   let dataLines = [];
+    //   for (const line of lines) {
+    //     if (line.startsWith('data:')) {
+    //       dataLines.push(line.slice(5));
+    //     } else if (line === '') {
+    //       if (dataLines.length) {
+    //         onEvent(dataLines.join('\n'));
+    //         dataLines = [];
+    //       }
+    //     } else if (line.startsWith(':')) {
+    //       // comment, игнорируем
+    //     } else {
+    //       // другие поля (event:, id:, retry:) можно обработать при необходимости
+    //     }
+    //   }
+    // }
+    //
+    // // --- UI: плавающая панель для стрима ---
+    // function ensureStreamPanel() {
+    //   let panel = document.getElementById('sse-stream-panel');
+    //   if (panel) return panel;
+    //   panel = document.createElement('div');
+    //   panel.id = 'sse-stream-panel';
+    //   panel.style.position = 'fixed';
+    //   panel.style.right = '20px';
+    //   panel.style.bottom = '20px';
+    //   panel.style.width = '420px';
+    //   panel.style.maxHeight = '60vh';
+    //   panel.style.overflow = 'auto';
+    //   panel.style.background = 'white';
+    //   panel.style.border = '1px solid #ccc';
+    //   panel.style.boxShadow = '0 6px 24px rgba(0,0,0,0.12)';
+    //   panel.style.zIndex = 999999;
+    //   panel.style.fontFamily = 'monospace';
+    //   panel.style.fontSize = '13px';
+    //   panel.style.padding = '8px';
+    //   const hdr = document.createElement('div');
+    //   hdr.style.fontWeight = '600';
+    //   hdr.style.marginBottom = '6px';
+    //   hdr.innerText = 'SSE stream (Live)';
+    //   const closeBtn = document.createElement('button');
+    //   closeBtn.textContent = '×';
+    //   closeBtn.style.float = 'right';
+    //   closeBtn.style.marginLeft = '8px';
+    //   closeBtn.onclick = () => panel.remove();
+    //   hdr.appendChild(closeBtn);
+    //   panel.appendChild(hdr);
+    //   const content = document.createElement('div');
+    //   content.id = 'sse-stream-content';
+    //   panel.appendChild(content);
+    //   document.body.appendChild(panel);
+    //   return panel;
+    // }
+    // function appendStreamLine(text) {
+    //   const panel = ensureStreamPanel();
+    //   const content = panel.querySelector('#sse-stream-content');
+    //   const el = document.createElement('div');
+    //   el.style.padding = '4px 2px';
+    //   el.style.borderBottom = '1px dashed #eee';
+    //   el.textContent = text;
+    //   content.appendChild(el);
+    //   // прокрутка вниз
+    //   content.scrollTop = content.scrollHeight;
+    // }
+    //
+    // // --- перехват fetch ---
+    // (function() {
+    //   if (!window.fetch) return;
+    //   const origFetch = window.fetch.bind(window);
+    //   window.fetch = async function(input, init) {
+    //     // выполняем запрос как обычно
+    //     const res = await origFetch(input, init);
+    //
+    //     try {
+    //       // content-type может быть с charset => startsWith check
+    //       const ct = res.headers.get('content-type') || '';
+    //       if (ct.startsWith('text/event-stream')) {
+    //         // создаём панель
+    //         ensureStreamPanel();
+    //         appendStreamLine('[Stream connected] ' + (typeof input === 'string' ? input : (input.url || 'request')));
+    //
+    //         // поток читаем через ReadableStream
+    //         const reader = res.body.getReader();
+    //         const decoder = new TextDecoder('utf-8');
+    //         let buffer = '';
+    //         let closed = false;
+    //
+    //         // читаем до конца
+    //         while (!closed) {
+    //           const { done, value } = await reader.read();
+    //           if (done) { closed = true; break; }
+    //           buffer += decoder.decode(value, { stream: true });
+    //
+    //           // разбираем buffer на полные SSE-блоки (пустая строка разделяет)
+    //           // но здесь используем простую функцию, которая ищет data: и пустую строку
+    //           // и вызывает onEvent для каждого найденного блока.
+    //           // чтобы избежать частичного парсинга — оставляем неполные строки в buffer.
+    //           // split на двойной перевод строки
+    //           const parts = buffer.split(/\n\n/);
+    //           // все, кроме последнего — полные блоки
+    //           for (let i = 0; i < parts.length - 1; i++) {
+    //             const block = parts[i];
+    //             // парсим данные
+    //             parseSSEChunk(block + '\n\n', (data) => {
+    //               // если приходят специальные маркеры (например [DONE]) — можно обработать
+    //               appendStreamLine(data);
+    //             });
+    //           }
+    //           // оставляем неполную часть в buffer
+    //           buffer = parts[parts.length - 1];
+    //         }
+    //
+    //         // остался последний буфер — обработаем
+    //         if (buffer.trim()) {
+    //           parseSSEChunk(buffer + '\n\n', (data) => appendStreamLine(data));
+    //         }
+    //
+    //         appendStreamLine('[Stream closed]');
+    //         // Возвращаем оригинал ответа, но его тело уже потреблено —
+    //         // некоторые клиенты ожидают чтение тела. Поэтому возвращаем мутированный Response:
+    //         return new Response(null, {
+    //           status: res.status,
+    //           statusText: res.statusText,
+    //           headers: res.headers
+    //         });
+    //       }
+    //     } catch (err) {
+    //       console.error('SSE intercept error', err);
+    //     }
+    //
+    //     // иначе — возвращаем оригинал
+    //     return res;
+    //   };
+    // })();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@latest"></script>
+</body>
+</html>
