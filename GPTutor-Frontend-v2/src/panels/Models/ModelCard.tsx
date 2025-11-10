@@ -126,7 +126,7 @@ export const ModelCard: FC<ModelCardProps> = ({
           )}
 
           <Button
-            style={{ width: "100%", maxWidth:'135px' }}
+            style={{ width: "100%", maxWidth:'145px' }}
             size="s"
             mode="outline"
             onClick={() => onTryModel(model.id)}
