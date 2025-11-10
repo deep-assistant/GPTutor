@@ -1,0 +1,6 @@
+.stepsSectionWrapper :global(.vkuiHorizontalScroll__in) {
+    padding-top: var(--vkui--size_base_padding_vertical--regular);
+    padding-bottom: var(--vkui--size_base_padding_vertical--regular);
+    margin-left: calc(var(--vkui--size_base_padding_vertical--regular));
+    margin-right: calc(var(--vkui--size_base_padding_vertical--regular));
+}

@@ -1,0 +1,1820 @@
+openapi: 3.0.3
+info:
+  title: Giga Router API
+  version: 1.0.1
+  description: |
+    # Giga Router API
+
+    Giga Router API предоставляет единый API для доступа к различным AI-моделям через один endpoint.
+
+    ## Быстрый старт
+
+    ### Использование с OpenAI SDK
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    completion = client.chat.completions.create(
+        model="google/gemini-2.5-flash-lite",
+        messages=[
+            {"role": "user", "content": "Привет! Как дела?"}
+        ]
+    )
+
+    print(completion.choices[0].message.content)
+    ```
+
+    **JavaScript:**
+    ```javascript
+    import OpenAI from 'openai';
+
+    const openai = new OpenAI({
+      baseURL: 'https://api.giga-router.ru/v1',
+      apiKey: 'your-api-key-here'
+    });
+
+    const completion = await openai.chat.completions.create({
+      model: 'google/gemini-2.5-flash-lite',
+      messages: [
+        { role: 'user', content: 'Привет! Как дела?' }
+      ]
+    });
+
+    console.log(completion.choices[0].message.content);
+    ```
+
+    # Мультимодальные запросы
+
+    ## Работа с изображениями
+
+    Giga Router API поддерживает отправку изображений к мультимодальным моделям через endpoint `/v1/chat/completions`. Вы можете отправлять изображения двумя способами: через прямые URL или в base64-кодированном виде.
+
+    **Основные возможности:**
+    - Анализ фотографий и скриншотов
+    - Описание содержимого изображений
+    - Извлечение текста с картинок (OCR)
+    - Сравнение изображений
+    - Ответы на вопросы по изображениям
+
+    **Поддерживаемые форматы:**
+    - PNG, JPEG, WebP, GIF
+    - Максимальный размер: до 20MB
+    - Можно отправлять несколько изображений в одном запросе
+
+    ### Отправка изображений через URL
+
+    Самый простой способ - использовать прямые ссылки на изображения в интернете:
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    completion = client.chat.completions.create(
+        model="google/gemini-2.5-flash-lite",
+        messages=[
+            {
+                "role": "user", 
+                "content": [
+                    {"type": "text", "text": "Что изображено на этой картинке?"},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": "https://storage.yandexcloud.net/giga-router/test-photo-router.jpg",
+                        }
+                    }
+                ]
+            }
+        ]
+    )
+
+    print(completion.choices[0].message.content)
+    ```
+
+    **JavaScript с Base64 изображением:**
+    ```javascript
+    import OpenAI from 'openai';
+
+    const openai = new OpenAI({
+      baseURL: 'https://api.giga-router.ru/v1',
+      apiKey: 'your-api-key-here'
+    });
+
+    // Конвертация файла в base64
+    const fs = require('fs');
+    const imageBuffer = fs.readFileSync('path/to/image.jpg');
+    const base64Image = imageBuffer.toString('base64');
+    const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'google/gemini-2.5-flash-lite',
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: 'Проанализируй это изображение' },
+            {
+              type: 'image_url',
+              image_url: {
+                url: dataUrl,
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    console.log(completion.choices[0].message.content);
+    ```
+
+    ## Работа с PDF документами
+
+    Giga Router API поддерживает обработку PDF документов через endpoint `/v1/chat/completions`. PDF файлы можно отправлять как прямые URL, так и в base64-кодированном виде. Эта функция работает с **любыми** моделями на Giga Router.
+
+    **Основные возможности:**
+    - Извлечение текста из PDF документов
+    - Анализ структуры документа
+    - Поиск информации в многостраничных документах
+    - Суммаризация содержимого
+    - Ответы на вопросы по содержимому PDF
+    - Работа со сканированными документами (OCR)
+
+    **Поддерживаемые форматы:**
+    - PDF документы любого размера
+    - Сканированные PDF (с OCR)
+    - Многостраничные документы
+    - Документы с изображениями и таблицами
+
+    ### Отправка PDF через URL
+
+    Для публично доступных PDF документов можно использовать прямые ссылки:
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    # Отправляем PDF по URL
+    completion = client.chat.completions.create(
+        model="google/gemini-2.5-flash-lite",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Проанализируй этот PDF документ"},
+                    {
+                        "type": "file",
+                        "file": {
+                            "filename": "document.pdf",
+                            "file_data": "https://storage.yandexcloud.net/giga-router/181_I-test.pdf"
+                        }
+                    }
+                ]
+            }
+        ]
+    )
+
+    print(completion.choices[0].message.content)
+    ```
+
+    **JavaScript:**
+    ```javascript
+    const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ваш-api-ключ',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'Проанализируй этот PDF документ' },
+              {
+                type: 'file',
+                file: {
+                  filename: 'document.pdf',
+                  file_data: 'https://storage.yandexcloud.net/giga-router/181_I-test.pdf'
+                }
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    console.log(data);
+    ```
+
+    ### Отправка локальных PDF файлов (Base64)
+
+    Для PDF файлов, хранящихся локально, используйте base64-кодирование:
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+    import base64
+
+    def encode_pdf_to_base64(pdf_path):
+        """Конвертирует PDF в base64"""
+        with open(pdf_path, "rb") as pdf_file:
+            return base64.b64encode(pdf_file.read()).decode('utf-8')
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    # Кодируем локальный PDF
+    pdf_path = "путь/к/документу.pdf"
+    base64_pdf = encode_pdf_to_base64(pdf_path)
+    data_url = f"data:application/pdf;base64,{base64_pdf}"
+
+    # Отправляем запрос
+    completion = client.chat.completions.create(
+        model="google/gemini-2.5-flash-lite",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Что содержится в этом документе?"},
+                    {
+                        "type": "file",
+                        "file": {
+                            "filename": "document.pdf",
+                            "file_data": data_url
+                        }
+                    }
+                ]
+            }
+        ]
+    )
+
+    print(completion.choices[0].message.content)
+    ```
+
+    **JavaScript:**
+    ```javascript
+    // Функция для конвертации PDF в base64
+    function encodePDFToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Использование с input элементом
+    const fileInput = document.getElementById('pdfInput');
+    const file = fileInput.files[0];
+
+    if (file) {
+      const base64PDF = await encodePDFToBase64(file);
+      
+      const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ваш-api-ключ',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash-lite',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: 'Проанализируй этот PDF' },
+                {
+                  type: 'file',
+                  file: {
+                    filename: file.name,
+                    file_data: base64PDF
+                  }
+                }
+              ]
+            }
+          ]
+        })
+      });
+      
+      const data = await response.json();
+      console.log(data);
+    }
+    ```
+
+    ### Оптимизация работы с PDF
+
+    **Повторное использование аннотаций:**
+    
+    При первом запросе с PDF API возвращает аннотации файла. Их можно сохранить и использовать в последующих запросах, чтобы избежать повторной обработки документа:
+
+    ```python
+    # Первый запрос - получаем аннотации
+    response = client.chat.completions.create(
+        model="google/gemini-2.5-flash-lite",
+        messages=[...]
+    )
+    
+    # Сохраняем аннотации
+    annotations = response.choices[0].message.annotations
+    
+    # Последующие запросы с аннотациями (без повторной обработки PDF)
+    follow_up = client.chat.completions.create(
+        model="google/gemini-2.5-flash-lite",
+        messages=[
+            {"role": "user", "content": "Дай краткое резюме"},
+            {"role": "assistant", "content": "...", "annotations": annotations},
+            {"role": "user", "content": "Какие ключевые моменты?"}
+        ]
+    )
+    ```
+
+    ### Типы обработки PDF
+
+    - **Автоматическая обработка** - API сам выбирает оптимальный метод
+    - **Текстовая обработка** - для документов с четким текстом (бесплатно)
+    - **OCR обработка** - для сканированных документов (платно)
+    - **Нативная обработка** - для моделей с встроенной поддержкой файлов
+
+    ### Поддерживаемые возможности
+
+    - **Извлечение текста** из любых PDF документов
+    - **Анализ структуры** - заголовки, параграфы, списки
+    - **Работа с таблицами** - извлечение данных из таблиц
+    - **OCR для сканированных документов** - распознавание текста с изображений
+    - **Многостраничные документы** - обработка документов любой длины
+    - **Смешанный контент** - текст, изображения, таблицы в одном документе
+
+    ## Генерация изображений
+
+    Giga Router API поддерживает генерацию изображений через модели с поддержкой модальности `"image"` в `output_modalities`. Эти модели могут создавать изображения из текстовых описаний.
+
+    **Основные возможности:**
+    - Генерация изображений по текстовому описанию
+    - Создание изображений в различных стилях
+    - Поддержка streaming для генерации
+    - Множественная генерация изображений
+    - Высокое качество и детализация
+
+    **Поддерживаемые форматы:**
+    - PNG изображения в base64 формате
+    - Различные размеры и разрешения
+    - Высокое качество генерации
+
+    ### Базовая генерация изображений
+
+    Для генерации изображений используйте параметр `modalities` с включением `"image"` и `"text"`:
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    # Генерируем изображение
+    completion = client.chat.completions.create(
+        model="google/gemini-2.5-flash-image-preview",
+        messages=[
+            {
+                "role": "user",
+                "content": "Создай красивое изображение заката над горами"
+            }
+        ],
+        modalities=["image", "text"]
+    )
+
+    # Получаем сгенерированное изображение
+    if completion.choices[0].message.images:
+        for image in completion.choices[0].message.images:
+            image_url = image["image_url"]["url"]  # Base64 data URL
+            print(f"Сгенерированное изображение: {image_url[:50]}...")
+    ```
+
+    **JavaScript:**
+    ```javascript
+    const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ваш-api-ключ',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [
+          {
+            role: 'user',
+            content: 'Создай красивое изображение заката над горами'
+          }
+        ],
+        modalities: ['image', 'text']
+      })
+    });
+
+    const result = await response.json();
+
+    // Получаем сгенерированное изображение
+    if (result.choices) {
+      const message = result.choices[0].message;
+      if (message.images) {
+        message.images.forEach((image, index) => {
+          const imageUrl = image.image_url.url; // Base64 data URL
+          console.log(`Сгенерированное изображение ${index + 1}: ${imageUrl.substring(0, 50)}...`);
+        });
+      }
+    }
+    ```
+
+    ### Streaming генерация изображений
+
+    Генерация изображений также поддерживает streaming режим:
+
+    **Python:**
+    ```python
+    import requests
+    import json
+
+    url = "https://api.giga-router.ru/v1/chat/completions"
+    headers = {
+        "Authorization": "Bearer ваш-api-ключ",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "google/gemini-2.5-flash-image-preview",
+        "messages": [
+            {
+                "role": "user",
+                "content": "Создай изображение футуристического города"
+            }
+        ],
+        "modalities": ["image", "text"],
+        "stream": True
+    }
+
+    response = requests.post(url, headers=headers, json=payload, stream=True)
+
+    for line in response.iter_lines():
+        if line:
+            line = line.decode('utf-8')
+            if line.startswith('data: '):
+                data = line[6:]
+                if data != '[DONE]':
+                    try:
+                        chunk = json.loads(data)
+                        if chunk.get("choices"):
+                            delta = chunk["choices"][0].get("delta", {})
+                            if delta.get("images"):
+                                for image in delta["images"]:
+                                    print(f"Сгенерированное изображение: {image['image_url']['url'][:50]}...")
+                    except json.JSONDecodeError:
+                        continue
+    ```
+
+    **JavaScript:**
+    ```javascript
+    const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ваш-api-ключ',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [
+          {
+            role: 'user',
+            content: 'Создай изображение футуристического города'
+          }
+        ],
+        modalities: ['image', 'text'],
+        stream: true
+      })
+    });
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data !== '[DONE]') {
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.choices) {
+                const delta = parsed.choices[0].delta;
+                if (delta?.images) {
+                  delta.images.forEach((image, index) => {
+                    console.log(`Сгенерированное изображение ${index + 1}: ${image.image_url.url.substring(0, 50)}...`);
+                  });
+                }
+              }
+            } catch (e) {
+              // Пропускаем невалидный JSON
+            }
+          }
+        }
+      }
+    }
+    ```
+
+    ### Формат ответа
+
+    При генерации изображений ответ содержит поле `images` с сгенерированными изображениями:
+
+    ```json
+    {
+      "choices": [
+        {
+          "message": {
+            "role": "assistant",
+            "content": "Я создал для вас красивое изображение заката.",
+            "images": [
+              {
+                "type": "image_url",
+                "image_url": {
+                  "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+    ```
+
+    ### Совместимость моделей
+
+    Не все модели поддерживают генерацию изображений. Для использования этой функции:
+
+    1. **Проверьте Output Modalities** - убедитесь, что модель имеет `"image"` в `output_modalities`
+    2. **Установите параметр modalities** - включите `"modalities": ["image", "text"]` в запросе
+    3. **Используйте совместимые модели** - например, `google/gemini-2.5-flash-image-preview`
+
+    ### Лучшие практики
+
+    - **Четкие промпты** - предоставляйте детальные описания для лучшего качества
+    - **Выбор модели** - выбирайте модели, специально предназначенные для генерации изображений
+    - **Обработка ошибок** - проверяйте наличие поля `images` в ответах
+    - **Хранение** - продумайте, как обрабатывать и хранить base64 данные изображений
+
+    ## Работа с аудио файлами
+
+    Giga Router API поддерживает отправку аудио файлов к совместимым моделям через endpoint `/v1/chat/completions`. Аудио файлы должны быть закодированы в base64 формате.
+
+    **Основные возможности:**
+    - Транскрипция аудио в текст
+    - Анализ речи и интонации
+    - Извлечение информации из аудио
+    - Обработка голосовых команд
+    - Анализ эмоций в речи
+
+    **Поддерживаемые форматы:**
+    - WAV - высокое качество, без сжатия
+    - MP3 - сжатый формат, меньший размер
+    - Максимальный размер: до 25MB
+
+    **Важно:** Аудио файлы должны быть **base64-кодированными** - прямые URL не поддерживаются для аудио контента.
+
+    ### Отправка аудио файлов
+
+    Для отправки аудио файлов используйте тип контента `input_audio`:
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+    import base64
+
+    def encode_audio_to_base64(audio_path):
+        """Конвертирует аудио в base64"""
+        with open(audio_path, "rb") as audio_file:
+            return base64.b64encode(audio_file.read()).decode('utf-8')
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    # Кодируем аудио файл
+    audio_path = "путь/к/аудио.wav"
+    base64_audio = encode_audio_to_base64(audio_path)
+
+    # Отправляем запрос
+    completion = client.chat.completions.create(
+        model="google/gemini-2.5-flash",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Расшифруй этот аудио файл"},
+                    {
+                        "type": "input_audio",
+                        "input_audio": {
+                            "data": base64_audio,
+                            "format": "wav"
+                        }
+                    }
+                ]
+            }
+        ]
+    )
+
+    print(completion.choices[0].message.content)
+    ```
+
+    **JavaScript:**
+    ```javascript
+    // Функция для конвертации аудио в base64
+    function encodeAudioToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]); // Убираем data:audio/wav;base64,
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Использование с input элементом
+    const audioInput = document.getElementById('audioInput');
+    const file = audioInput.files[0];
+
+    if (file) {
+      const base64Audio = await encodeAudioToBase64(file);
+      
+      const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ваш-api-ключ',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: 'Расшифруй этот аудио файл' },
+                {
+                  type: 'input_audio',
+                  input_audio: {
+                    data: base64Audio,
+                    format: 'wav'
+                  }
+                }
+              ]
+            }
+          ]
+        })
+      });
+      
+      const data = await response.json();
+      console.log(data);
+    }
+    ```
+
+    ### Поддерживаемые форматы аудио
+
+    - **WAV** - высокое качество, без сжатия, рекомендуется для точной транскрипции
+    - **MP3** - сжатый формат, меньший размер файла, подходит для длинных записей
+
+    ### Совместимость моделей
+
+    Не все модели поддерживают обработку аудио. Для использования этой функции:
+
+    1. **Проверьте Input Modalities** - убедитесь, что модель имеет `"audio"` в `input_modalities`
+    2. **Используйте совместимые модели** - например, `google/gemini-2.5-flash`
+    3. **Base64 кодирование** - аудио файлы должны быть закодированы в base64
+
+    ### Лучшие практики
+
+    - **Качество аудио** - используйте WAV для лучшего качества транскрипции
+    - **Размер файла** - учитывайте ограничения по размеру (до 25MB)
+    - **Длительность** - короткие аудио файлы обрабатываются быстрее
+    - **Фоновый шум** - чистое аудио дает лучшие результаты
+
+    ## Веб-поиск
+
+    Giga Router API поддерживает интеграцию актуальных данных из интернета для любой модели через веб-поиск. Это позволяет получать свежую информацию и фактические данные в реальном времени.
+
+    **Основные возможности:**
+    - Поиск актуальной информации в интернете
+    - Получение свежих новостей и данных
+    - Фактическая проверка информации
+    - Исследование тем с актуальными источниками
+    - Цитирование источников в ответах
+
+    **Способы активации:**
+    - Добавление `:online` к названию модели
+    - Использование плагина `web`
+    - Настройка параметров поиска
+
+    ### Активация веб-поиска
+
+    **Способ 1: Модификатор :online**
+    
+    Самый простой способ - добавить `:online` к названию модели:
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    # Используем модель с веб-поиском
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o:online",
+        messages=[
+            {
+                "role": "user",
+                "content": "Какие последние новости о развитии ИИ?"
+            }
+        ]
+    )
+
+    print(completion.choices[0].message.content)
+    ```
+
+    **JavaScript:**
+    ```javascript
+    const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ваш-api-ключ',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-4o:online',
+        messages: [
+          {
+            role: 'user',
+            content: 'Какие последние новости о развитии ИИ?'
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    console.log(data);
+    ```
+
+    **Способ 2: Плагин web**
+
+    Более гибкий способ - использование плагина `web`:
+
+    **Python:**
+    ```python
+    from openai import OpenAI
+
+    client = OpenAI(
+        base_url="https://api.giga-router.ru/v1",
+        api_key="your-api-key-here"
+    )
+
+    # Используем плагин web
+    completion = client.chat.completions.create(
+        model="openai/gpt-4o",
+        messages=[
+            {
+                "role": "user",
+                "content": "Найди информацию о последних достижениях в квантовых вычислениях"
+            }
+        ],
+        plugins=[
+            {
+                "id": "web",
+                "max_results": 3,
+                "search_prompt": "Вот актуальные результаты поиска:"
+            }
+        ]
+    )
+
+    print(completion.choices[0].message.content)
+    ```
+
+    **JavaScript:**
+    ```javascript
+    const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ваш-api-ключ',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: 'Найди информацию о последних достижениях в квантовых вычислениях'
+          }
+        ],
+        plugins: [
+          {
+            id: 'web',
+            max_results: 3,
+            search_prompt: 'Вот актуальные результаты поиска:'
+          }
+        ]
+      })
+    });
+
+    const data = await response.json();
+    console.log(data);
+    ```
+
+    ### Настройка веб-поиска
+
+    **Параметры плагина web:**
+
+    ```json
+    {
+      "id": "web",
+      "engine": "exa",           // "native", "exa" или не указано
+      "max_results": 5,          // Максимум результатов (по умолчанию 5)
+      "search_prompt": "..."     // Промпт для включения результатов
+    }
+    ```
+
+    **Выбор движка поиска:**
+
+    - **`native`** - использует встроенные возможности провайдера
+    - **`exa`** - использует Exa API для поиска
+    - **не указано** - автоматический выбор (native для OpenAI/Anthropic, exa для остальных)
+
+    ### Формат ответа с цитированием
+
+    При использовании веб-поиска ответ содержит аннотации с источниками:
+
+    ```json
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Вот актуальная информация: ...",
+        "annotations": [
+          {
+            "type": "url_citation",
+            "url_citation": {
+              "url": "https://example.com/news",
+              "title": "Заголовок статьи",
+              "content": "Содержимое статьи",
+              "start_index": 100,
+              "end_index": 200
+            }
+          }
+        ]
+      }
+    }
+    ```
+
+    ### Стоимость веб-поиска
+
+    **Exa поиск:**
+    - 800₽ за 1000 результатов
+    - По умолчанию 5 результатов = 4₽ за запрос
+
+    **Нативный поиск:**
+    - Стоимость передается от провайдера
+    - Зависит от размера контекста поиска (low/medium/high)
+
+    ### Размер контекста поиска
+
+    Можно указать размер контекста поиска:
+
+    ```json
+    {
+      "model": "openai/gpt-4o",
+      "messages": [...],
+      "web_search_options": {
+        "search_context_size": "high"  // "low", "medium", "high"
+      }
+    }
+    ```
+
+    ### Лучшие практики
+
+    - **Четкие запросы** - формулируйте конкретные вопросы для лучших результатов
+    - **Ограничение результатов** - используйте `max_results` для контроля стоимости
+    - **Проверка источников** - всегда проверяйте аннотации с источниками
+    - **Актуальность** - веб-поиск особенно полезен для свежих данных
+
+    # Streaming
+
+    API поддерживает streaming ответы от любой модели. Это полезно для создания чат-интерфейсов или других приложений, где UI должен обновляться по мере генерации ответа.
+
+    **Python:**
+    ```python
+    import requests
+    import json
+
+    response = requests.post(
+        'https://api.giga-router.ru/v1/chat/completions',
+        headers={'Authorization': 'Bearer your-api-key-here'},
+        json={
+            'model': 'google/gemini-2.5-flash-lite',
+            'messages': [{'role': 'user', 'content': 'Расскажи историю'}],
+            'stream': True
+        },
+        stream=True
+    )
+
+    for line in response.iter_lines():
+        if line:
+            line_text = line.decode('utf-8')
+            if line_text.startswith('data: '):
+                data = line_text[6:]
+                if data == '[DONE]':
+                    break
+                try:
+                    parsed = json.loads(data)
+                    content = parsed['choices'][0]['delta'].get('content')
+                    if content:
+                        print(content, end='', flush=True)
+                except json.JSONDecodeError:
+                    pass
+    ```
+
+    **JavaScript:**
+    ```javascript
+    const response = await fetch('https://api.giga-router.ru/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer your-api-key-here',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite',
+        messages: [{ role: 'user', content: 'Расскажи историю' }],
+        stream: true
+      })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') continue;
+          
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              process.stdout.write(content);
+            }
+          } catch (e) {
+            // Игнорируем ошибки парсинга
+          }
+        }
+      }
+    }
+    ```
+
+    # Аутентификация
+
+    API использует Bearer токены для аутентификации. Получите ваш API ключ в профиле приложения https://vk.com/app54187353#/profile
+
+    ```bash
+    curl -H "Authorization: Bearer your-api-key-here" \
+         https://api.giga-router.ru/v1/chat/completions
+    ```
+
+    # Стоимость
+
+    Стоимость рассчитывается автоматически на основе токенов и списывается с баланса пользователя. Информация о стоимости включена в каждый ответ.
+
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.giga-router.ru/
+    description: Production server
+
+tags:
+  - name: Chat Completions
+    description: OpenAI-совместимые chat completions с поддержкой streaming
+  - name: Мультимодальность
+    description: Работа с изображениями, PDF и другими типами контента
+  - name: Chat Models
+    description: Управление и получение информации о доступных моделях LLM
+  - name: Files
+    description: Управление файлами - загрузка, удаление и получение списка файлов пользователя
+
+paths:
+  /v1/chat/completions:
+    post:
+      tags: [Chat Completions]
+      summary: Создание chat completion
+      description: |
+        Создание chat completion с поддержкой streaming.
+        
+        ## Параметры
+        
+        - `model` - модель для генерации (по умолчанию: google/gemini-2.5-flash-lite)
+        - `messages` - массив сообщений для контекста
+        - `stream` - включить streaming режим
+        - `max_tokens` - максимальное количество токенов
+        - `temperature` - креативность ответа (0.0-1.0)
+        
+        ## Мультимодальность
+        
+        API поддерживает отправку различных типов контента вместе с текстом для создания более богатых и интерактивных запросов.
+        
+        ### Изображения
+        
+        API поддерживает отправку изображений через параметр `messages`. Изображения можно отправлять как URL, так и в base64-кодированном виде. Поддерживаются форматы: PNG, JPEG, WebP, GIF.
+        
+        ### PDF
+        
+        API поддерживает обработку PDF документов через параметр `messages`. PDF можно отправлять как URL, так и в base64-кодированном виде. Поддерживается извлечение текста, анализ структуры и OCR для сканированных документов.
+        
+        ### Аудио
+        
+        API поддерживает обработку аудио файлов через параметр `messages`. Аудио файлы должны быть в base64-кодированном виде. Поддерживается транскрипция, анализ речи и извлечение информации из аудио.
+        
+        ### Веб-поиск
+        
+        API поддерживает интеграцию актуальных данных из интернета через веб-поиск. Активируется добавлением `:online` к модели или использованием плагина `web`. Поддерживается поиск свежей информации с цитированием источников.
+        
+        ## Streaming
+        
+        При `stream: true` ответ приходит в формате Server-Sent Events:
+        
+        ```
+        data: {"choices":[{"delta":{"content":"Hello"}}]}
+        data: {"choices":[{"delta":{"content":" there!"}}]}
+        data: [DONE]
+        ```
+        
+        ## Стоимость
+        
+        Стоимость рассчитывается автоматически и списывается с баланса пользователя. Информация о стоимости включена в каждый ответ.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+            examples:
+              simple:
+                summary: Простой запрос
+                value:
+                  model: "google/gemini-2.5-flash-lite"
+                  messages:
+                    - role: "user"
+                      content: "Привет! Как дела?"
+              streaming:
+                summary: Streaming запрос
+                value:
+                  model: "google/gemini-2.5-flash-lite"
+                  messages:
+                    - role: "user"
+                      content: "Расскажи историю"
+                  stream: true
+                  max_tokens: 150
+              advanced:
+                summary: Продвинутый запрос
+                value:
+                  model: "anthropic/claude-3-haiku"
+                  messages:
+                    - role: "user"
+                      content: "Объясни квантовую физику простыми словами"
+                  max_tokens: 500
+                  temperature: 0.7
+              image:
+                summary: Запрос с изображением
+                value:
+                  model: "google/gemini-2.5-flash-lite"
+                  messages:
+                    - role: "user"
+                      content:
+                        - type: "text"
+                          text: "Что изображено на этой картинке?"
+                        - type: "image_url"
+                          image_url:
+                            url: "https://storage.yandexcloud.net/giga-router/test-photo-router.jpg"
+                            detail: "high"
+              pdf:
+                summary: Запрос с PDF документом
+                value:
+                  model: "google/gemini-2.5-flash-lite"
+                  messages:
+                    - role: "user"
+                      content:
+                        - type: "text"
+                          text: "Проанализируй этот PDF документ"
+                        - type: "file"
+                          file:
+                            filename: "document.pdf"
+                            file_data: "https://storage.yandexcloud.net/giga-router/181_I-test.pdf"
+              image_generation:
+                summary: Генерация изображения
+                value:
+                  model: "google/gemini-2.5-flash-image-preview"
+                  messages:
+                    - role: "user"
+                      content: "Создай красивое изображение заката над горами"
+                  modalities: ["image", "text"]
+              audio:
+                summary: Запрос с аудио файлом
+                value:
+                  model: "google/gemini-2.5-flash"
+                  messages:
+                    - role: "user"
+                      content:
+                        - type: "text"
+                          text: "Расшифруй этот аудио файл"
+                        - type: "input_audio"
+                          input_audio:
+                            data: "base64-encoded-audio-data"
+                            format: "wav"
+              web_search:
+                summary: Запрос с веб-поиском
+                value:
+                  model: "openai/gpt-4o:online"
+                  messages:
+                    - role: "user"
+                      content: "Какие последние новости о развитии ИИ?"
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+              examples:
+                non_streaming:
+                  summary: Обычный ответ
+                  value:
+                    id: "chatcmpl-abc123"
+                    object: "chat.completion"
+                    created: 1677652288
+                    model: "google/gemini-2.5-flash-lite"
+                    choices:
+                      - index: 0
+                        message:
+                          role: "assistant"
+                          content: "Привет! У меня всё отлично, спасибо!"
+                        finish_reason: "stop"
+                    usage:
+                      prompt_tokens: 4
+                      completion_tokens: 147
+                      total_tokens: 151
+                      cost: 0.0000592
+                      prompt_tokens_details:
+                        cached_tokens: 0
+                        audio_tokens: 0
+                      cost_details:
+                        upstream_inference_completions_cost: 0.0053
+                      completion_tokens_details:
+                        reasoning_tokens: 0
+                        image_tokens: 0
+            text/event-stream:
+              schema:
+                type: string
+                description: Server-Sent Events для streaming режима
+              examples:
+                streaming:
+                  summary: Streaming ответ
+                  value: |
+                    data: {"id":"chatcmpl-abc123","object":"chat.completion.chunk","created":1677652288,"model":"google/gemini-2.5-flash-lite","choices":[{"index":0,"delta":{"role":"assistant","content":""},"finish_reason":null}]}
+                    
+                    data: {"id":"chatcmpl-abc123","object":"chat.completion.chunk","created":1677652288,"model":"google/gemini-2.5-flash-lite","choices":[{"index":0,"delta":{"content":"Привет"},"finish_reason":null}]}
+                    
+                    data: {"id":"chatcmpl-abc123","object":"chat.completion.chunk","created":1677652288,"model":"google/gemini-2.5-flash-lite","choices":[{"index":0,"delta":{"content":"!"},"finish_reason":null}]}
+                    
+                    data: {"id":"chatcmpl-abc123","object":"chat.completion.chunk","created":1677652288,"model":"google/gemini-2.5-flash-lite","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+                    
+                    data: [DONE]
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '402':
+          $ref: '#/components/responses/InsufficientBalance'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /v1/models:
+    get:
+      tags: [ChatModels]
+      summary: Получить список доступных моделей
+      description: |
+        Получить список моделей от популярных провайдеров с ценами в рублях.
+        **Поддерживаемые провайдеры:** x-ai, deepseek, google, qwen, perplexity, mistralai, openai
+        
+        ## Ценообразование
+        
+        Все цены возвращаются в рублях:
+
+      responses:
+        '200':
+          description: Список моделей успешно получен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      models:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Model'
+                      total:
+                        type: integer
+                        description: Общее количество моделей
+                        example: 45
+                      providers:
+                        type: array
+                        items:
+                          type: string
+                        description: Список поддерживаемых провайдеров
+                        example: ["x-ai", "deepseek", "google", "qwen", "perplexity", "mistralai", "openai"]
+                      lastUpdated:
+                        type: string
+                        format: date-time
+                        description: Время последнего обновления
+                        example: "2025-01-28T10:30:00.000Z"
+              examples:
+                success:
+                  summary: Успешный ответ
+                  value:
+                    success: true
+                    data:
+                      models:
+                        - id: "google/gemini-2.5-flash-lite-preview-09-2025"
+                          name: "Google: Gemini 2.5 Flash Lite Preview 09-2025"
+                          description: "Gemini 2.5 Flash-Lite is a lightweight reasoning model..."
+                          context_length: 1048576
+                          pricing_rub:
+                            prompt: 0.000009
+                            completion: 0.000036
+                            request: 0
+                            image: 0
+                            web_search: 0
+                            internal_reasoning: 0
+
+                      total: 45
+                      providers: ["x-ai", "deepseek", "google", "qwen", "perplexity", "mistralai", "openai"]
+                      lastUpdated: "2025-01-28T10:30:00.000Z"
+        '503':
+          description: Сервис моделей не готов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Models service not ready"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /user:
+    get:
+      tags: [Authentication]
+      summary: Получить данные пользователя
+      description: |
+        Получает информацию о пользователе, включая баланс, API ключ и данные VK.
+        
+        Требует VK подпись в заголовке Authorization.
+      security:
+        - VkAuth: []
+      responses:
+        '200':
+          description: Данные пользователя получены успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "User data retrieved successfully!"
+                      vkData:
+                        type: object
+                        description: "Данные от VK"
+                      dbUser:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          vkId:
+                            type: string
+                          balance:
+                            type: number
+                          apiKey:
+                            type: string
+                          isActive:
+                            type: boolean
+                          createdAt:
+                            type: string
+                            format: date-time
+                          updatedAt:
+                            type: string
+                            format: date-time
+                      timestamp:
+                        type: string
+                        format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /update-token:
+    post:
+      tags: [Authentication]
+      summary: Обновление API токена
+      description: |
+        Генерирует новый API ключ для пользователя. Старый ключ становится недействительным.
+        
+        Требует VK авторизацию.
+      security:
+        - VkAuth: []
+      responses:
+        '200':
+          description: Токен успешно обновлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "API token updated successfully!"
+                      newApiKey:
+                        type: string
+                        description: "Новый API ключ"
+                        example: "sk-abc123..."
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          vkId:
+                            type: string
+                          balance:
+                            type: number
+                          isActive:
+                            type: boolean
+                          updatedAt:
+                            type: string
+                            format: date-time
+                      timestamp:
+                        type: string
+                        format: date-time
+              examples:
+                success:
+                  summary: Успешное обновление токена
+                  value:
+                    success: true
+                    data:
+                      message: "API token updated successfully!"
+                      newApiKey: "sk-abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567890"
+                      user:
+                        id: "user_123"
+                        vkId: "vk_456"
+                        balance: 10.5
+                        isActive: true
+                        updatedAt: "2024-01-15T10:30:00Z"
+                      timestamp: "2024-01-15T10:30:00Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    ApiKeyBearer:
+      type: http
+      scheme: bearer
+      description: |
+        API ключ пользователя для доступа к LLM endpoints.
+    VkAuth:
+      type: http
+      scheme: bearer
+      description: |
+        VK подпись для авторизации через VK приложение.
+        Передается в заголовке Authorization как Bearer token.
+
+  schemas:
+    ChatCompletionRequest:
+      type: object
+      required: [messages]
+      properties:
+        model:
+          type: string
+          default: "google/gemini-2.5-flash-lite"
+          example: "google/gemini-2.5-flash-lite"
+          description: |
+            Модель для генерации ответа. Поддерживаются все модели OpenRouter.
+            
+            **Популярные модели:**
+            - `google/gemini-2.5-flash-lite` - быстрая и дешевая
+            - `anthropic/claude-3-haiku` - сбалансированная
+            - `openai/gpt-4o-mini` - OpenAI модель
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+          example:
+            - role: "user"
+              content: "Привет!"
+        max_tokens:
+          type: integer
+          minimum: 1
+          maximum: 4000
+          example: 150
+          description: Максимальное количество токенов в ответе
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          example: 0.7
+          description: Креативность ответа (0 = детерминированный, 2 = очень креативный)
+        top_p:
+          type: number
+          minimum: 0
+          maximum: 1
+          example: 0.9
+          description: Nucleus sampling параметр
+        frequency_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+          example: 0
+          description: Штраф за повторение слов
+        presence_penalty:
+          type: number
+          minimum: -2
+          maximum: 2
+          example: 0
+          description: Штраф за повторение тем
+        stop:
+          type: array
+          items:
+            type: string
+          example: ["\n", "###"]
+          description: Стоп-последовательности для завершения генерации
+        stream:
+          type: boolean
+          default: false
+          example: true
+          description: Включить streaming режим (Server-Sent Events)
+
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant]
+          example: "user"
+          description: |
+            Роль отправителя сообщения:
+            - `system` - системные инструкции для AI
+            - `user` - сообщения пользователя  
+            - `assistant` - ответы AI
+        content:
+          type: string
+          example: "Привет! Как дела?"
+          description: Текст сообщения
+
+    ChatCompletionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "chatcmpl-abc123"
+        object:
+          type: string
+          example: "chat.completion"
+        created:
+          type: integer
+          example: 1677652288
+        model:
+          type: string
+          example: "google/gemini-2.5-flash-lite"
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatChoice'
+        usage:
+          $ref: '#/components/schemas/Usage'
+
+    ChatChoice:
+      type: object
+      properties:
+        index:
+          type: integer
+          example: 0
+        message:
+          $ref: '#/components/schemas/ChatMessage'
+        finish_reason:
+          type: string
+          enum: [stop, length, content_filter]
+          example: "stop"
+
+    Usage:
+      type: object
+      description: |
+        Информация об использовании токенов и стоимости.
+        
+        **Структура ответа:**
+        - `prompt_tokens` - токены запроса
+        - `completion_tokens` - токены ответа  
+        - `total_tokens` - всего токенов
+        - `cost` - цена в рублях
+      properties:
+        prompt_tokens:
+          type: integer
+          example: 4
+          description: Количество токенов в запросе
+        completion_tokens:
+          type: integer
+          example: 147
+          description: Количество токенов в ответе
+        total_tokens:
+          type: integer
+          example: 151
+          description: Общее количество токенов
+        cost:
+          type: number
+          format: float
+          example: 0.0000592
+          description: Стоимость запроса в рублях
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid API key"
+
+    Model:
+      type: object
+      description: Модель LLM с ценами в рублях
+      properties:
+        id:
+          type: string
+          description: Уникальный идентификатор модели
+          example: "google/gemini-2.5-flash-lite-preview-09-2025"
+        canonical_slug:
+          type: string
+          description: Канонический слаг модели
+          example: "google/gemini-2.5-flash-lite-preview-09-2025"
+        hugging_face_id:
+          type: string
+          description: ID модели в Hugging Face
+          example: ""
+        name:
+          type: string
+          description: Человекочитаемое название модели
+          example: "Google: Gemini 2.5 Flash Lite Preview 09-2025"
+        created:
+          type: integer
+          description: Unix timestamp создания модели
+          example: 1758819686
+        description:
+          type: string
+          description: Описание модели
+          example: "Gemini 2.5 Flash-Lite is a lightweight reasoning model..."
+        context_length:
+          type: integer
+          description: Максимальная длина контекста
+          example: 1048576
+        architecture:
+          type: object
+          description: Архитектура модели
+          properties:
+            modality:
+              type: string
+              example: "text+image->text"
+            input_modalities:
+              type: array
+              items:
+                type: string
+              example: ["file", "image", "text", "audio"]
+            output_modalities:
+              type: array
+              items:
+                type: string
+              example: ["text"]
+            tokenizer:
+              type: string
+              example: "Gemini"
+            instruct_type:
+              type: string
+              nullable: true
+              example: null
+        pricing_rub:
+          type: object
+          description: Цены в рублях
+          properties:
+            prompt:
+              type: number
+              description: Цена за входной токен
+              example: 0.000009
+            completion:
+              type: number
+              description: Цена за выходной токен
+              example: 0.000036
+            request:
+              type: number
+              description: Фиксированная цена за запрос
+              example: 0
+            image:
+              type: number
+              description: Цена за изображение
+              example: 0
+            web_search:
+              type: number
+              description: Цена за веб-поиск
+              example: 0
+            internal_reasoning:
+              type: number
+              description: Цена за внутренние рассуждения
+              example: 0
+        top_provider:
+          type: object
+          description: Информация о топ-провайдере
+          properties:
+            context_length:
+              type: integer
+              example: 1048576
+            max_completion_tokens:
+              type: integer
+              example: 65536
+            is_moderated:
+              type: boolean
+              example: false
+        supported_parameters:
+          type: array
+          items:
+            type: string
+          description: Поддерживаемые параметры
+          example: ["include_reasoning", "max_tokens", "reasoning", "response_format", "seed", "stop", "structured_outputs", "temperature", "tool_choice", "tools", "top_p"]
+        default_parameters:
+          type: object
+          description: Параметры по умолчанию
+          properties:
+            temperature:
+              type: number
+              nullable: true
+            top_p:
+              type: number
+              nullable: true
+            frequency_penalty:
+              type: number
+              nullable: true
+
+    FileInfo:
+      type: object
+      description: Информация о файле
+      properties:
+        id:
+          type: string
+          description: Уникальный идентификатор файла
+          example: "file_123"
+        name:
+          type: string
+          description: Оригинальное имя файла
+          example: "document.pdf"
+        type:
+          type: string
+          description: MIME-тип файла
+          example: "application/pdf"
+        url:
+          type: string
+          description: URL для доступа к файлу в облачном хранилище
+          example: "https://gptutor-bucket.storage.yandexcloud.net/uuid.pdf"
+        size:
+          type: integer
+          description: Размер файла в байтах
+          example: 1024000
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата и время загрузки файла
+          example: "2024-01-15T10:30:00Z"
+
+  responses:
+    UnauthorizedError:
+      description: Ошибка авторизации
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            invalid_api_key:
+              summary: Неверный API ключ
+              value:
+                error: "Invalid API key or inactive user"
+            missing_api_key:
+              summary: Отсутствует API ключ
+              value:
+                error: "Missing or invalid Authorization header"
+
+    Unauthorized:
+      description: Ошибка VK авторизации
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            invalid_vk_auth:
+              summary: Неверная VK авторизация
+              value:
+                error: "Invalid VK authorization"
+
+    ValidationError:
+      description: Ошибка валидации
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missing_messages:
+              summary: Отсутствует массив messages
+              value:
+                error: "messages array is required"
+
+    InsufficientBalance:
+      description: Недостаточно средств
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            low_balance:
+              summary: Недостаточно средств
+              value:
+                error: "Insufficient balance"
+
+    InternalError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            server_error:
+              summary: Ошибка сервера
+              value:
+                error: "Internal server error"

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GPTutor Backend v2 API Documentation (Dark Theme)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #1a1a1a;
+    }
+  </style>
+</head>
+<body>
+  <script
+    id="api-reference"
+    data-url="./openapi.yaml"
+    data-configuration='{
+      "theme": "saturn",
+      "layout": "modern",
+      "hideModels": false,
+      "hideDownloadButton": false,
+      "darkMode": true,
+      "searchHotKey": "k",
+      "showSidebar": true,
+      "customCss": "body { background: #1a1a1a; }",
+      "hiddenClients": [],
+      "defaultHttpClient": {
+        "targetKey": "javascript",
+        "clientKey": "fetch"
+      },
+      "hooks": {
+        "onRequest": "handleStreamingRequest"
+      }
+    }'></script>
+
+  <script>
+    // Кастомная обработка streaming запросов
+    window.handleStreamingRequest = async function(request, context) {
+      const isStreaming = request.body &&
+        (typeof request.body === 'string' ?
+          JSON.parse(request.body).stream :
+          request.body.stream);
+
+      if (isStreaming && request.method === 'POST' && request.url.includes('/chat/completions')) {
+        try {
+          const response = await fetch(request.url, {
+            method: request.method,
+            headers: request.headers,
+            body: request.body
+          });
+
+          if (!response.ok) {
+            const error = await response.text();
+            return {
+              status: response.status,
+              body: error,
+              headers: Object.fromEntries(response.headers)
+            };
+          }
+
+          // Обрабатываем streaming ответ
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let streamContent = '';
+          let fullContent = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            streamContent += chunk;
+
+            // Парсим SSE события
+            const lines = chunk.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  const content = parsed.choices?.[0]?.delta?.content;
+                  if (content) {
+                    fullContent += content;
+                  }
+                } catch (e) {
+                  // Игнорируем ошибки парсинга
+                }
+              }
+            }
+          }
+
+          // Возвращаем симулированный non-streaming ответ для отображения
+          const mockResponse = {
+            id: "chatcmpl-stream-" + Date.now(),
+            object: "chat.completion",
+            created: Math.floor(Date.now() / 1000),
+            model: JSON.parse(request.body).model || "google/gemini-2.5-flash-lite",
+            choices: [{
+              index: 0,
+              message: {
+                role: "assistant",
+                content: fullContent || "Streaming completed successfully"
+              },
+              finish_reason: "stop"
+            }],
+            usage: {
+              prompt_tokens: 0,
+              completion_tokens: 0,
+              total_tokens: 0,
+              streaming_note: "This was a streaming response converted for display"
+            }
+          };
+
+          return {
+            status: 200,
+            body: JSON.stringify(mockResponse, null, 2),
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Streaming-Converted': 'true'
+            }
+          };
+
+        } catch (error) {
+          return {
+            status: 500,
+            body: JSON.stringify({ error: error.message }),
+            headers: { 'Content-Type': 'application/json' }
+          };
+        }
+      }
+
+      // Для не-streaming запросов возвращаем null, чтобы Scalar обработал их обычным способом
+      return null;
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@latest"></script>
+</body>
+</html>

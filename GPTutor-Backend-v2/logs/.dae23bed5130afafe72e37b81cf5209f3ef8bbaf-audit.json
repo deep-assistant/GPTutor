@@ -1,0 +1,75 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\.dae23bed5130afafe72e37b81cf5209f3ef8bbaf-audit.json",
+    "files": [
+        {
+            "date": 1759046211929,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-09-28.log",
+            "hash": "7e3e02ec325de51199240903431f044c996d4e2379ab4b43b9e8909956f90964"
+        },
+        {
+            "date": 1759130099610,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-09-29.log",
+            "hash": "e2ec2102e6b7e97ca321b5226d23ed50acd7fb860920057367bcbf631b2ae71d"
+        },
+        {
+            "date": 1759255316948,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-09-30.log",
+            "hash": "3c155086fd96f86b7f2cd1f95097a02a1f8236ed857af5587f9468ac42788b8a"
+        },
+        {
+            "date": 1759267431253,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-01.log",
+            "hash": "5e6807da4f4c269a84961333be78591c0ecfc0c510d2768ae1a287f378c01a44"
+        },
+        {
+            "date": 1759354501242,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-02.log",
+            "hash": "801a635c11c69aa58959e3f04dccb9893e00227cee8c592012129395f3fee04c"
+        },
+        {
+            "date": 1759441874413,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-03.log",
+            "hash": "080d597be87c8762e2666a4c9aa935bbad7b241d13bd4d9c64588215e3503385"
+        },
+        {
+            "date": 1759743199970,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-06.log",
+            "hash": "e17223482775e67f8286ec8d4ed3e855eeb9b2ecd2a77dff92b35ca4299778ae"
+        },
+        {
+            "date": 1759788413236,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-07.log",
+            "hash": "b5705e649a58d3222809b366de10b5af2f559115b1b6c8556d7fa0dba52bbb22"
+        },
+        {
+            "date": 1759871884355,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-08.log",
+            "hash": "e11ad8b89c6cef6610c83dcc6114481813695397be5f5c2e8609758d223c4c11"
+        },
+        {
+            "date": 1759957213637,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-09.log",
+            "hash": "2660501b676cd30d28f561453542c1cb9f629a7ddc45383f22078dce2b283727"
+        },
+        {
+            "date": 1760081524035,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-10.log",
+            "hash": "388c523cb472abdefa7fcc9f30c3180837e78dc9051acb2f5abcb49b97934aff"
+        },
+        {
+            "date": 1760278745767,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-12.log",
+            "hash": "44f86b8ada9f3157bedc11f649c348091232af001a112cd7075392d54d857d73"
+        },
+        {
+            "date": 1760526675195,
+            "name": "C:\\Users\\grisha_blyat\\PhpstormProjects\\untitled10\\GPTutor\\GPTutor-Backend-v2\\logs\\api-2025-10-15.log",
+            "hash": "e1994c77e535e65eab3cf015888f2c35b5e2b21c7b2a8cb3d65911c252f89b1d"
+        }
+    ],
+    "hashType": "sha256"
+}

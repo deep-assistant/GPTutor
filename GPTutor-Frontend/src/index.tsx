@@ -12,12 +12,10 @@ import { OnboardingService } from "./services/OnboardingService";
 import { NavigationContextProvider } from "$/NavigationContext";
 import { adService } from "$/services/AdService";
 import { appService } from "$/services/AppService";
-import { subscriptionsController } from "$/entity/subscriptions";
 import { VkStorageService } from "$/services/VkStorageService";
 import "react-lazy-load-image-component/src/effects/black-and-white.css";
 import { userInfo } from "$/entity/user/UserInfo";
 import { listenResize } from "./resizeWindow";
-import { additionalRequests } from "$/entity/additionalRequest/AdditionalRequests";
 import { platformAdapter } from "$/services/PlatformAdapterService";
 
 const isFirstVisitFlagName = "isFirstVisit";
@@ -39,20 +37,20 @@ async function VKInit() {
     storageService.set(isFirstVisitFlagName, String(true));
   });
 
-  if (appService.isStableArt()) {
-    await userInfo.getUserImageAgreement();
-  }
+  // if (appService.isStableArt()) {
+  //   await userInfo.getUserImageAgreement();
+  // }
   await adService.showBannerAd();
-  if (appService.isGPTutor()) {
-    await subscriptionsController.getSubscription("subscription_2");
-  }
-  await additionalRequests.init();
+  // if (appService.isGPTutor()) {
+  //   await subscriptionsController.getSubscription("subscription_2");
+  // }
+  // await additionalRequests.init();
 }
 
 platformAdapter
   .webAppInit()
   .then(async () => {
-    await userInfo.getUserBalance();
+    // await userInfo.getUserBalance();
 
     if (appService.isVK()) {
       await VKInit();
@@ -128,6 +126,7 @@ const routes = {
     Panels.vkDocQuestionRequest,
     Views.viewMain
   ),
+  [RoutingPages.docQuestion]: new Page(Panels.docQuestion, Views.viewMain),
 };
 
 const router = new Router(routes);

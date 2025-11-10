@@ -12,12 +12,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 public class DeepService {
-    @Value("${master-token}")
-    String masterToken;
+//     @Value("${master-token}")
+//     String masterToken;
 
 
-    @Value("${deep-url}")
-    String deepUrl;
+//     @Value("${deep-url}")
+//     String deepUrl;
 
     public String getUserId() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
@@ -33,7 +33,7 @@ public class DeepService {
     public void updateUserToken(String operation, int amount) {
         String userId = this.getUserId();
 
-        String url = String.format(deepUrl + "/token?userId=%s&masterToken=%s", userId, this.masterToken);
+        String url = String.format( "/token?userId=%s&masterToken=%s", userId, "");
         System.out.println(url);
 
         RestTemplate restTemplate = new RestTemplate();
@@ -52,7 +52,7 @@ public class DeepService {
         String userId = this.getUserId();
         System.out.println(userId);
 
-        String url = String.format(deepUrl + "/token?userId=%s&masterToken=%s", userId, this.masterToken);
+        String url = String.format("/token?userId=%s&masterToken=%s", userId, "");
         System.out.println(url);
 
         RestTemplate restTemplate = new RestTemplate();
@@ -64,7 +64,7 @@ public class DeepService {
     public boolean hasUser() {
         String userId = this.getUserId();
 
-        String url = String.format(deepUrl + "/token/has?userId=%s&masterToken=%s", userId, this.masterToken);
+        String url = String.format("/token/has?userId=%s&masterToken=%s", userId, "");
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -85,7 +85,7 @@ public class DeepService {
     String getAdminToken() {
         String userId = this.getUserId();
 
-        String url = String.format(deepUrl + "/token?userId=%s&masterToken=%s", userId, this.masterToken);
+        String url = String.format("/token?userId=%s&masterToken=%s", userId, "");
 
         RestTemplate restTemplate = new RestTemplate();
 
