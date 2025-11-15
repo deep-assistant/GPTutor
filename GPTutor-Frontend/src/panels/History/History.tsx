@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Div,
+  IconButton,
   Panel,
   PanelHeaderBack,
   Search,
   Spinner,
   Title,
 } from "@vkontakte/vkui";
+import { Icon28FilterOutline } from "@vkontakte/icons";
 
 import { AppContainer } from "$/components/AppContainer";
 import { useNavigationContext } from "$/NavigationContext";
@@ -17,6 +19,7 @@ import { chatGpt } from "$/entity/GPT";
 import { AppPanelHeader } from "$/components/AppPanelHeader";
 
 import { HistoryDelete } from "./HistoryDelete";
+import { HistoryFilter } from "./HistoryFilter";
 
 import classes from "./History.module.css";
 import useDebounce from "$/hooks/useDebounce";
@@ -26,6 +29,8 @@ interface IProps {
 }
 
 function History({ id }: IProps) {
+  const [showFilter, setShowFilter] = useState(false);
+  
   const pageNumber = chatGpt.history.pageNumber;
   const loading = chatGpt.history.getHistory$.loading.get();
   const hasNextPage = chatGpt.history.hasNextHistory$.get();
@@ -51,7 +56,17 @@ function History({ id }: IProps) {
         headerChildren={
           <AppPanelHeader
             before={<PanelHeaderBack onClick={goBack} />}
-            after={<HistoryDelete />}
+            after={
+              <>
+                <IconButton
+                  onClick={() => setShowFilter(!showFilter)}
+                  aria-label="Открыть фильтры"
+                >
+                  <Icon28FilterOutline />
+                </IconButton>
+                <HistoryDelete />
+              </>
+            }
           >
             <Title level="1" Component="h1">
               История
@@ -59,6 +74,10 @@ function History({ id }: IProps) {
           </AppPanelHeader>
         }
       >
+        <HistoryFilter 
+          isOpen={showFilter}
+          onClose={() => setShowFilter(false)}
+        />
         <Search
           placeholder="Поиск по сообщениям"
           value={chatGpt.history.searchValue$.get()}

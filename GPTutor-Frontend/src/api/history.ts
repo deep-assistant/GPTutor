@@ -18,18 +18,28 @@ export function createHistory(params: HistoryCreate): Promise<History> {
 
 export function getHistoryById(
   pageNumber: number,
-  search: string
+  search: string,
+  type?: string,
+  lessonName?: string,
+  dateFrom?: string,
+  dateTo?: string
 ): Promise<Pageable<History>> {
-  return fetch(
-    `${BACKEND_HOST}history?pageNumber=${pageNumber}&search=${search}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: httpService.authorization,
-        "Content-Type": "application/json",
-      },
-    }
-  ).then((res) => res.json());
+  const params = new URLSearchParams();
+  params.append("pageNumber", pageNumber.toString());
+  params.append("search", search);
+  
+  if (type) params.append("type", type);
+  if (lessonName) params.append("lessonName", lessonName);
+  if (dateFrom) params.append("dateFrom", dateFrom);
+  if (dateTo) params.append("dateTo", dateTo);
+
+  return fetch(`${BACKEND_HOST}history?${params.toString()}`, {
+    method: "GET",
+    headers: {
+      Authorization: httpService.authorization,
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
 }
 
 export function deleteHistory(id: string) {
