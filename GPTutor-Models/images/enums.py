@@ -1,6 +1,23 @@
 from enum import Enum
 
 
+class MidjourneyModel(Enum):
+    MIDJOURNEY_V6 = "midjourney-v6"
+    MIDJOURNEY_V5_2 = "midjourney-v5.2"
+    MIDJOURNEY_V5_1 = "midjourney-v5.1"
+    MIDJOURNEY_V5 = "midjourney-v5"
+    MIDJOURNEY_NIJI_V6 = "midjourney-niji-v6"
+    MIDJOURNEY_NIJI_V5 = "midjourney-niji-v5"
+
+
+class MidjourneyStyle(Enum):
+    RAW = "raw"
+    EXPRESSIVE = "expressive"
+    CUTE = "cute"
+    SCENIC = "scenic"
+    ORIGINAL = "original"
+
+
 class ProdiaModel(Enum):
     CHILDREN_STORIES_V1= "childrensStories_v1SemiReal.safetensors [a1c56dbb]"
     ANALOG_V1 = "analog-diffusion-1.0.ckpt [9ca13f02]"

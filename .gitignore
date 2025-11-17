@@ -7,3 +7,8 @@
 .env-frontend
 .env-frontend-stage
 node_modules
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo

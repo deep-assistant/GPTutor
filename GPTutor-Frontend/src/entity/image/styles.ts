@@ -19,9 +19,26 @@ export const styles = [
     imageName: "3D-toon.png",
     label: "3D мультик",
   },
+  {
+    value: "midjourney-v6",
+    imageName: "midjourney.png",
+    label: "Midjourney",
+  },
 ];
 
 export const models = [
+  {
+    value: "midjourney-v6",
+    label: "Midjourney V6",
+  },
+  {
+    value: "midjourney-v5.2",
+    label: "Midjourney V5.2",
+  },
+  {
+    value: "midjourney-niji-v6",
+    label: "Midjourney Niji V6 (Anime)",
+  },
   {
     value: "ICantBelieveItsNotPhotography_seco.safetensors [4e7a3dfd]",
     label: "I Cant Believe Its Not Photography Seco",

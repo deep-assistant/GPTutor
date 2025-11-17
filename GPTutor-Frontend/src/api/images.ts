@@ -39,6 +39,21 @@ export function generateImageGet(
   }).then((res) => res.json());
 }
 
+export function generateMidjourneyImage(
+  params: GenerateImageRequest,
+  controller: AbortController
+): Promise<GeneratedImage[] & ErrorResponseType> {
+  return fetch(`${BACKEND_HOST}midjourney`, {
+    method: "POST",
+    headers: {
+      Authorization: httpService.authorization,
+      "Content-Type": "application/json",
+    },
+    signal: controller.signal,
+    body: JSON.stringify(params),
+  }).then((res) => res.json());
+}
+
 export async function getImageBase64(imageId: string): Promise<string> {
   const res = await fetch(`${BACKEND_HOST}image/${imageId}/base64`, {
     headers: {

@@ -2,7 +2,7 @@ import { memo, sig } from "dignals";
 import { ChipOption } from "@vkontakte/vkui";
 
 import ReactivePromise from "$/services/ReactivePromise";
-import { generateImage, getImageBase64 } from "$/api/images";
+import { generateImage, getImageBase64, generateMidjourneyImage } from "$/api/images";
 import {
   emptyImageGenerated,
   GeneratedImage,
@@ -308,6 +308,11 @@ class ImageGeneration {
     return seed;
   }
 
+  isMidjourneyModel() {
+    const model = this.model$.get();
+    return model.startsWith("midjourney");
+  }
+
   getPrompt() {
     return this.prompt$.get().trim() === ""
       ? emptyPrompt.ru
@@ -333,26 +338,27 @@ class ImageGeneration {
 
       this.abortController = new AbortController();
 
-      const result = await generateImage(
-        {
-          modelId: this.model$.get(),
-          prompt: prompt.trim(),
-          createdAt: new Date(),
-          guidanceScale: this.CFGScale$.get(),
-          seed: this.getSeed(),
-          expireTimestamp: datePlus30Days(),
-          samples: this.samples$.get(),
-          originalPrompt: "",
-          scheduler: this.sampler$.get(),
-          width: this.width$.get(),
-          height: this.height$.get(),
-          upscale: this.upscale$.get(),
-          numInferenceSteps: this.step$.get(),
-          loraModel: this.loraModel$.get(),
-          negativePrompt: negativePrompt.trim(),
-        },
-        this.abortController!
-      );
+      const requestParams = {
+        modelId: this.model$.get(),
+        prompt: prompt.trim(),
+        createdAt: new Date(),
+        guidanceScale: this.CFGScale$.get(),
+        seed: this.getSeed(),
+        expireTimestamp: datePlus30Days(),
+        samples: this.samples$.get(),
+        originalPrompt: "",
+        scheduler: this.sampler$.get(),
+        width: this.width$.get(),
+        height: this.height$.get(),
+        upscale: this.upscale$.get(),
+        numInferenceSteps: this.step$.get(),
+        loraModel: this.loraModel$.get(),
+        negativePrompt: negativePrompt.trim(),
+      };
+
+      const result = this.isMidjourneyModel() 
+        ? await generateMidjourneyImage(requestParams, this.abortController!)
+        : await generateImage(requestParams, this.abortController!);
 
       if (result.error) {
         console.log(result);
