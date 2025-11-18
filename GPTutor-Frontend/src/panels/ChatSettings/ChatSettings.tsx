@@ -12,6 +12,7 @@ import { AppContainer } from "$/components/AppContainer";
 import { AppPanelHeader } from "$/components/AppPanelHeader";
 import { TabsContainer } from "$/components/TabsContainer";
 import { ModelsForm } from "$/panels/ChatSettings/ModelsForm";
+import { ChatGptInfoForm } from "$/panels/ChatSettings/ChatGptInfoForm";
 
 interface IProps {
   id: string;
@@ -62,6 +63,11 @@ function ChatSettings({ id }: IProps) {
                   updateSystemMessage={updateSystemMessage}
                 />
               ),
+            },
+            {
+              id: "chatgpt-info",
+              title: "Что такое ChatGPT",
+              content: <ChatGptInfoForm />,
             },
           ]}
         />
