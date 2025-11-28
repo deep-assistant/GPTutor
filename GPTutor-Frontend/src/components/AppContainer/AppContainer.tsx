@@ -55,7 +55,11 @@ function AppContainer({
 
   return (
     <>
-      {headerChildren && <div ref={setHeaderElem as any}>{headerChildren}</div>}
+      {headerChildren && (
+        <div ref={setHeaderElem as any} style={{ position: 'relative', zIndex: 100 }}>
+          {headerChildren}
+        </div>
+      )}
       <div
         ref={containerRef}
         className={classNames(classes.container, className, {

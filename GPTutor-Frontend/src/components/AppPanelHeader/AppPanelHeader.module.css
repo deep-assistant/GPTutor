@@ -1,3 +1,10 @@
+.panelHeader {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--vkui--color_background_content);
+}
+
 .panelHeader :global(.vkuiPanelHeader__before) {
     flex: none;
 }
