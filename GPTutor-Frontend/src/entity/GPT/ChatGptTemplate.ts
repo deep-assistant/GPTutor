@@ -18,6 +18,7 @@ import { SubscriptionGPT } from "$/entity/GPT/SubscriptionGPT";
 import { getBannerName } from "$/entity/history/utils";
 import { gptModels } from "$/entity/GPT/GptModels";
 import { userInfo } from "$/entity/user/UserInfo";
+import { DialogRestoreService } from "./DialogRestoreService";
 
 const initialSystemContent = `Тебя зовут Deep.GPT, будь полезным помощником.`;
 
@@ -355,42 +356,11 @@ export abstract class ChatGptTemplate {
     lessonsController.clearLesson();
   }
 
-  //todo рефакторинг
-  async restoreDialogFromHistory(dialog: History, goToChat: () => void) {
-    this.closeDelay();
-
-    this.currentHistory = dialog;
-
-    const messages = await this.getMessages$.run(dialog.id);
-
-    if (this.getMessages$.error.get()) {
-      return snackbarNotify.notify({
-        type: "error",
-        message: "Ошибка при переходе в диплог",
-      });
-    }
-
-    await this.prepareDialog(dialog);
-
-    this.initialSystemContent = dialog.systemMessage;
-    this.systemMessage = new GptMessage(dialog.systemMessage, GPTRoles.system);
-
-    this.messages$.set(
-      messages.map((message) => {
-        const gptMessage = new GptMessage(
-          message.content,
-          message.role as GPTRoles,
-          false,
-          message.error
-        );
-
-        gptMessage.failedModeration$.set(message.isFailedModeration);
-
-        return gptMessage;
-      })
-    );
-
-    this.checkOnRunOutOfMessages();
-    goToChat();
+  /**
+   * Restore dialog from history using DialogRestoreService
+   * Refactored to improve separation of concerns and reduce complexity
+   */
+  async restoreDialogFromHistory(dialog: History, goToChat: () => void): Promise<void> {
+    return DialogRestoreService.restoreDialog(this, dialog, goToChat);
   }
 }
