@@ -74,6 +74,7 @@ import ApplicationInfoHumor from "./modals/ApplicationInfoHumor/ApplicationInfoH
 import { BingPanel } from "$/panels/BingPanel";
 import VKDocQuestionPanel from "./panels/VKDocQuestionPanel/VKDocQestionPanel";
 import { VkDocQuestionRequest } from "$/panels/VkDocQuestionRequest";
+import { MarkdownReader } from "$/panels/MarkdownReader";
 import { retrieveLaunchParams } from "@telegram-apps/sdk";
 
 const App = () => {
@@ -198,6 +199,7 @@ const App = () => {
                 <BingPanel id={Panels.bingPanel} />
                 <VKDocQuestionPanel id={Panels.vkDocQuestionPanel} />
                 <VkDocQuestionRequest id={Panels.vkDocQuestionRequest} />
+                <MarkdownReader id={Panels.markdownReader} />
               </View>
             )}
           </SplitLayout>

@@ -1,0 +1,110 @@
+.container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.markdownContent {
+  flex: 1;
+  background: var(--vkui--color_background_content);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--vkui--color_separator_primary);
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+.markdownContent h1,
+.markdownContent h2,
+.markdownContent h3,
+.markdownContent h4,
+.markdownContent h5,
+.markdownContent h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdownContent h1 {
+  font-size: 2em;
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+  padding-bottom: 0.3em;
+}
+
+.markdownContent h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--vkui--color_separator_primary);
+  padding-bottom: 0.3em;
+}
+
+.markdownContent h3 {
+  font-size: 1.25em;
+}
+
+.markdownContent p {
+  margin-bottom: 16px;
+}
+
+.markdownContent code {
+  background: var(--vkui--color_background_secondary);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.markdownContent pre {
+  background: var(--vkui--color_background_secondary);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.markdownContent blockquote {
+  border-left: 4px solid var(--vkui--color_accent);
+  margin: 16px 0;
+  padding: 0 16px;
+  color: var(--vkui--color_text_secondary);
+}
+
+.markdownContent ul,
+.markdownContent ol {
+  padding-left: 2em;
+  margin: 16px 0;
+}
+
+.markdownContent li {
+  margin: 0.25em 0;
+}
+
+.markdownContent a {
+  color: var(--vkui--color_accent);
+  text-decoration: none;
+}
+
+.markdownContent a:hover {
+  text-decoration: underline;
+}
+
+.markdownContent table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.markdownContent th,
+.markdownContent td {
+  border: 1px solid var(--vkui--color_separator_primary);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.markdownContent th {
+  background: var(--vkui--color_background_secondary);
+  font-weight: 600;
+}
