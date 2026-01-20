@@ -57,6 +57,8 @@ export type NavigationContextType = {
   goToAnecdoteMain: () => void;
   goToBingPanel: () => void;
   goToVkDocQuestionRequest: () => void;
+  goToTopicSuggestions: () => void;
+  goToTopicSuggestionModal: () => void;
   openAlert: (data: AlertType) => void;
   alert: AlertType;
   isForbidden: boolean;
@@ -223,6 +225,14 @@ export function NavigationContextProvider({
     router.pushPage(RoutingPages.vkDocQuestionRequest);
   };
 
+  const goToTopicSuggestions = () => {
+    router.pushPage(RoutingPages.topicSuggestions);
+  };
+
+  const goToTopicSuggestionModal = () => {
+    router.pushModal(Modals.topicSuggestionModal);
+  };
+
   return (
     <NavigationContext.Provider
       value={{
@@ -266,6 +276,8 @@ export function NavigationContextProvider({
         goToAnecdoteMain,
         goToVkDocQuestionRequest,
         goToBingPanel,
+        goToTopicSuggestions,
+        goToTopicSuggestionModal,
         alert,
         isForbidden,
       }}

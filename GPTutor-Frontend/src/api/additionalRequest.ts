@@ -4,8 +4,6 @@ import {
 } from "$/entity/additionalRequest/types";
 import { httpService } from "$/services/HttpService";
 
-const BACKEND_HOST = env.REACT_APP_BACKEND_HOST;
-
 export function createAdditionalRequest(
   params: AdditionalRequestCreate
 ): Promise<AdditionalRequest> {
@@ -19,7 +17,7 @@ export function getAdditionalRequest(): Promise<AdditionalRequest[]> {
 }
 
 export function deleteAdditionalRequestById(id: string) {
-  return httpService.delete("additional-request");
+  return httpService.delete(`additional-request/${id}`);
 }
 
 export function updateAdditionalRequestById(params: AdditionalRequest) {

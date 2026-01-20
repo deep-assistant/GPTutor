@@ -21,6 +21,7 @@ import {
   Icon24AddOutline,
   Icon24DeleteOutline,
   Icon28MagicWandOutline,
+  Icon28LightbulbOutline,
 } from "@vkontakte/icons";
 import { additionalRequests } from "$/entity/additionalRequest/AdditionalRequests";
 import { AdditionalRequest } from "$/panels/AdditionalRequests/AdditionalRequest";
@@ -30,7 +31,7 @@ interface IProps {
 }
 
 function AdditionalRequests({ id }: IProps) {
-  const { goBack } = useNavigationContext();
+  const { goBack, goToTopicSuggestions } = useNavigationContext();
 
   const onSubmit = () => {
     snackbarNotify.notify({
@@ -58,6 +59,16 @@ function AdditionalRequests({ id }: IProps) {
               }
             >
               Создать Сниппет
+            </Button>
+            <Spacing size={8} />
+            <Button
+              style={{ width: "100%" }}
+              size="m"
+              mode="secondary"
+              before={<Icon28LightbulbOutline />}
+              onClick={goToTopicSuggestions}
+            >
+              Предложить тему
             </Button>
           </Div>
         }

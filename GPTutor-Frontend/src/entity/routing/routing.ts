@@ -41,6 +41,8 @@ export enum RoutingPages {
   vkDocQuestionPanel = "/vk-doc-question-panel",
 
   vkDocQuestionRequest = "/vk-doc-question-request",
+
+  topicSuggestions = "/topic-suggestions",
 }
 
 export enum Views {
@@ -89,6 +91,8 @@ export enum Panels {
   vkDocQuestionPanel = "vk-doc-question-panel",
 
   vkDocQuestionRequest = "vk-doc-question-request",
+
+  topicSuggestions = "topic-suggestions",
 }
 
 export enum Modals {
@@ -103,4 +107,6 @@ export enum Modals {
 
   alert = "alert",
   imageDonut = "image-donut",
+
+  topicSuggestionModal = "topic-suggestion-modal",
 }
