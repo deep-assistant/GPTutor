@@ -1,0 +1,5 @@
+
+> chat@0.0.0 build
+> cross-env GENERATE_SOURCEMAP=false craco build
+
+sh: 1: cross-env: not found

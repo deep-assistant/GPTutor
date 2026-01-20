@@ -14,6 +14,7 @@ export * from "./ChapterItem";
 export * from "./modeType";
 export * from "./LessonItem";
 export * from "./LessonRequest";
+export * from "./ActionSuggestion";
 export * from "./lessonsItem/javascript";
 export * from "./lessonsItem/html";
 export * from "./lessonsItem/git";
